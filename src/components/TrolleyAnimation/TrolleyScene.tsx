@@ -21,7 +21,19 @@ const TrolleyScene: React.FC<TrolleySceneProps> = ({ onPathSelect }) => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-8 bg-gradient-to-b from-sky-100 to-green-50 rounded-xl shadow-lg">
+    <div className="w-full max-w-4xl mx-auto">
+      {/* Clear Instructions */}
+      <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-4 text-center">
+        <h3 className="text-lg font-semibold text-blue-800 mb-2">
+          🚂 The Decision Point
+        </h3>
+        <p className="text-blue-700">
+          Click on one of the three colored tracks below to explore that path.
+          Watch as the trolley travels down your chosen track!
+        </p>
+      </div>
+
+      <div className="p-8 bg-gradient-to-b from-sky-100 to-green-50 rounded-xl shadow-lg">
       <svg
         viewBox="0 0 800 400"
         className="w-full h-auto"
@@ -146,10 +158,18 @@ const TrolleyScene: React.FC<TrolleySceneProps> = ({ onPathSelect }) => {
         <text x="110" y="240" textAnchor="middle" fill="#374151" fontSize="16" fontWeight="bold">
           Your Decision
         </text>
-        <text x="250" y="380" textAnchor="middle" fill="#6B7280" fontSize="12">
-          Click a path to explore
-        </text>
+        {!selectedPath && (
+          <text x="400" y="380" textAnchor="middle" fill="#DC2626" fontSize="14" fontWeight="bold">
+            ⬆ Click any colored track above to make your choice!
+          </text>
+        )}
+        {selectedPath && (
+          <text x="400" y="380" textAnchor="middle" fill="#10B981" fontSize="14" fontWeight="bold">
+            ✓ Path selected! See analysis below
+          </text>
+        )}
       </svg>
+      </div>
 
       {hoveredPath && (
         <AnimatePresence>
