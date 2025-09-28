@@ -85,7 +85,7 @@ const ReviewStep: React.FC<ReviewStepProps> = ({ data, onPrev }) => {
               <span className="font-medium">Organization:</span> {data.organizationType}
             </div>
             <div>
-              <span className="font-medium">AI Type:</span> {data.aiInitiativeType}
+              <span className="font-medium">AI Types:</span> {data.aiInitiativeTypes?.join(', ') || ''}
             </div>
             <div>
               <span className="font-medium">Urgency:</span> {data.problemUrgency}

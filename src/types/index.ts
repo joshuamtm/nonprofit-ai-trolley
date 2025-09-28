@@ -4,7 +4,7 @@ export interface SessionData {
   organizationMission: string;
 
   // Step 2: AI Initiative
-  aiInitiativeType: string;
+  aiInitiativeTypes: string[];
   initiativeDescription: string;
   expectedOutcomes: string[];
 
@@ -18,7 +18,7 @@ export interface SessionData {
     accuracyErrors: number;
     techDependency: number;
   };
-  biggestFear: string;
+  biggestFears: string[];
 
   // Step 4: Context
   currentCapacity: string;

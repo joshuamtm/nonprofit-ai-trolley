@@ -116,7 +116,7 @@ const generateRisks = (data: SessionData, highConcerns: string[]): string[] => {
     risks.push('Significant resistance from staff and stakeholders');
   }
 
-  if (data.biggestFear === 'harm_beneficiaries') {
+  if (data.biggestFears && data.biggestFears.includes('harm_beneficiaries')) {
     risks.push('Potential harm to vulnerable beneficiaries if system fails');
   }
 

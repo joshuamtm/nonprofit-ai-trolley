@@ -74,7 +74,7 @@ export const generatePDF = (
   yPosition += 5;
 
   addSubtitle('AI Initiative');
-  addText(`Type: ${formatAIType(data.aiInitiativeType)}`);
+  addText(`Type(s): ${formatAITypes(data.aiInitiativeTypes)}`);
   addText(`Description: ${data.initiativeDescription}`);
   yPosition += 5;
 
@@ -219,6 +219,11 @@ const formatAIType = (type: string): string => {
     'other': 'Other'
   };
   return types[type] || type;
+};
+
+const formatAITypes = (types: string[]): string => {
+  if (!types || types.length === 0) return 'Not specified';
+  return types.map(type => formatAIType(type)).join(', ');
 };
 
 const formatUrgency = (urgency: string): string => {

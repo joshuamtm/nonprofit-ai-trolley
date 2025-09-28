@@ -13,7 +13,7 @@ interface StepTwoProps {
 const StepTwo: React.FC<StepTwoProps> = ({ data, updateData, onNext, onPrev }) => {
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
-      aiInitiativeType: data.aiInitiativeType || '',
+      aiInitiativeTypes: data.aiInitiativeTypes || [],
       initiativeDescription: data.initiativeDescription || '',
       expectedOutcomes: data.expectedOutcomes || []
     }
@@ -21,7 +21,7 @@ const StepTwo: React.FC<StepTwoProps> = ({ data, updateData, onNext, onPrev }) =
 
   const onSubmit = (formData: any) => {
     updateData({
-      aiInitiativeType: formData.aiInitiativeType,
+      aiInitiativeTypes: formData.aiInitiativeTypes,
       initiativeDescription: formData.initiativeDescription,
       expectedOutcomes: formData.expectedOutcomes
     });
@@ -48,22 +48,32 @@ const StepTwo: React.FC<StepTwoProps> = ({ data, updateData, onNext, onPrev }) =
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            What type of AI initiative are you considering?
+            What type(s) of AI Initiative(s) are you considering?
           </label>
-          <select
-            {...register('aiInitiativeType', { required: 'Please select an initiative type' })}
-            className="input-field"
-          >
-            <option value="">Select an option...</option>
-            <option value="data_analysis">Data Analysis & Insights</option>
-            <option value="chatbot">Chatbot/Automated Response</option>
-            <option value="content_generation">Content Generation</option>
-            <option value="automation">Process Automation</option>
-            <option value="decision_support">Decision Support System</option>
-            <option value="other">Other</option>
-          </select>
-          {errors.aiInitiativeType && (
-            <p className="mt-1 text-sm text-red-600">{errors.aiInitiativeType.message}</p>
+          <div className="space-y-2">
+            {[
+              { value: 'data_analysis', label: 'Data Analysis & Insights' },
+              { value: 'chatbot', label: 'Chatbot/Automated Response' },
+              { value: 'content_generation', label: 'Content Generation' },
+              { value: 'automation', label: 'Process Automation' },
+              { value: 'decision_support', label: 'Decision Support System' },
+              { value: 'other', label: 'Other' }
+            ].map((option) => (
+              <label key={option.value} className="flex items-center">
+                <input
+                  type="checkbox"
+                  value={option.value}
+                  {...register('aiInitiativeTypes', {
+                    validate: value => value.length > 0 || 'Please select at least one initiative type'
+                  })}
+                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+              </label>
+            ))}
+          </div>
+          {errors.aiInitiativeTypes && (
+            <p className="mt-1 text-sm text-red-600">{errors.aiInitiativeTypes.message}</p>
           )}
         </div>
 

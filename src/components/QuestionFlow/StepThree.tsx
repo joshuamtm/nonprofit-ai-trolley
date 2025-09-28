@@ -20,7 +20,7 @@ const StepThree: React.FC<StepThreeProps> = ({ data, updateData, onNext, onPrev 
       humanDignity: data.primaryConcerns?.humanDignity || 3,
       accuracyErrors: data.primaryConcerns?.accuracyErrors || 3,
       techDependency: data.primaryConcerns?.techDependency || 3,
-      biggestFear: data.biggestFear || ''
+      biggestFears: data.biggestFears || []
     }
   });
 
@@ -45,7 +45,7 @@ const StepThree: React.FC<StepThreeProps> = ({ data, updateData, onNext, onPrev 
         accuracyErrors: parseInt(formData.accuracyErrors),
         techDependency: parseInt(formData.techDependency)
       },
-      biggestFear: formData.biggestFear
+      biggestFears: formData.biggestFears
     });
     onNext();
   };
@@ -103,22 +103,32 @@ const StepThree: React.FC<StepThreeProps> = ({ data, updateData, onNext, onPrev 
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            What's your biggest fear if this goes wrong?
+            What are your biggest fears if this goes wrong?
           </label>
-          <select
-            {...register('biggestFear', { required: 'Please select your biggest concern' })}
-            className="input-field"
-          >
-            <option value="">Select an option...</option>
-            <option value="harm_beneficiaries">Harm to beneficiaries</option>
-            <option value="loss_trust">Loss of trust</option>
-            <option value="mission_drift">Mission drift</option>
-            <option value="staff_morale">Staff morale impact</option>
-            <option value="resource_waste">Resource waste</option>
-            <option value="other">Other</option>
-          </select>
-          {errors.biggestFear && (
-            <p className="mt-1 text-sm text-red-600">{errors.biggestFear.message}</p>
+          <div className="space-y-2">
+            {[
+              { value: 'harm_beneficiaries', label: 'Harm to beneficiaries' },
+              { value: 'loss_trust', label: 'Loss of trust' },
+              { value: 'mission_drift', label: 'Mission drift' },
+              { value: 'staff_morale', label: 'Staff morale impact' },
+              { value: 'resource_waste', label: 'Resource waste' },
+              { value: 'other', label: 'Other' }
+            ].map((option) => (
+              <label key={option.value} className="flex items-center">
+                <input
+                  type="checkbox"
+                  value={option.value}
+                  {...register('biggestFears', {
+                    validate: value => value.length > 0 || 'Please select at least one fear'
+                  })}
+                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-700">{option.label}</span>
+              </label>
+            ))}
+          </div>
+          {errors.biggestFears && (
+            <p className="mt-1 text-sm text-red-600">{errors.biggestFears.message}</p>
           )}
         </div>
 
