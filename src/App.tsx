@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SessionData } from './types';
+import WelcomeSection from './components/WelcomeSection';
 import StepOne from './components/QuestionFlow/StepOne';
 import EnhancedStepTwo from './components/QuestionFlow/EnhancedStepTwo';
 import StepThree from './components/QuestionFlow/StepThree';
@@ -9,7 +10,7 @@ import EnhancedReviewStep from './components/QuestionFlow/EnhancedReviewStep';
 import ProgressBar from './components/ProgressBar';
 
 function App() {
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0); // Start at 0 for welcome screen
   const [sessionData, setSessionData] = useState<Partial<SessionData>>({});
 
   const totalSteps = 5;
@@ -30,8 +31,14 @@ function App() {
     }
   };
 
+  const startAssessment = () => {
+    setCurrentStep(1);
+  };
+
   const renderStep = () => {
     switch (currentStep) {
+      case 0:
+        return <WelcomeSection onGetStarted={startAssessment} />;
       case 1:
         return (
           <StepOne
@@ -82,20 +89,24 @@ function App() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-4xl font-bold text-primary mb-2">
-            The Nonprofit AI Trolley Problem
-          </h1>
-          <p className="text-lg text-gray-600">
-            Navigate the ethical complexities of AI implementation
-          </p>
-        </motion.div>
+        {currentStep > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-8"
+          >
+            <h1 className="text-4xl font-bold text-primary mb-2">
+              The Nonprofit AI Trolley Problem
+            </h1>
+            <p className="text-lg text-gray-600">
+              Navigate the ethical complexities of AI implementation
+            </p>
+          </motion.div>
+        )}
 
-        <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+        {currentStep > 0 && (
+          <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+        )}
 
         <div className="max-w-3xl mx-auto mt-8">
           <AnimatePresence mode="wait">
