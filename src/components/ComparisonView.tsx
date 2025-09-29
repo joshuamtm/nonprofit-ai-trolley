@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, AlertCircle, Download } from 'lucide-react';
+import { CheckCircle, AlertCircle, Download } from 'lucide-react';
 import { SessionData, PathAnalysis } from '../types';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
