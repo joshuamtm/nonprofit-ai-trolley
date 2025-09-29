@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SessionData } from './types';
 import StepOne from './components/QuestionFlow/StepOne';
-import StepTwo from './components/QuestionFlow/StepTwo';
+import EnhancedStepTwo from './components/QuestionFlow/EnhancedStepTwo';
 import StepThree from './components/QuestionFlow/StepThree';
 import StepFour from './components/QuestionFlow/StepFour';
-import ReviewStep from './components/QuestionFlow/ReviewStep';
+import EnhancedReviewStep from './components/QuestionFlow/EnhancedReviewStep';
 import ProgressBar from './components/ProgressBar';
 
 function App() {
@@ -42,7 +42,7 @@ function App() {
         );
       case 2:
         return (
-          <StepTwo
+          <EnhancedStepTwo
             data={sessionData}
             updateData={updateSessionData}
             onNext={nextStep}
@@ -69,7 +69,7 @@ function App() {
         );
       case 5:
         return (
-          <ReviewStep
+          <EnhancedReviewStep
             data={sessionData as SessionData}
             onPrev={prevStep}
           />
