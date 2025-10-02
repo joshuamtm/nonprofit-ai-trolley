@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { SessionData } from './types';
-import WelcomeSection from './components/WelcomeSection';
-import StepOne from './components/QuestionFlow/StepOne';
-import EnhancedStepTwo from './components/QuestionFlow/EnhancedStepTwo';
-import StepThree from './components/QuestionFlow/StepThree';
-import StepFour from './components/QuestionFlow/StepFour';
-import EnhancedReviewStep from './components/QuestionFlow/EnhancedReviewStep';
-import ProgressBar from './components/ProgressBar';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { SessionData } from "./types";
+import WelcomeSection from "./components/WelcomeSection";
+import StepOne from "./components/QuestionFlow/StepOne";
+import EnhancedStepTwo from "./components/QuestionFlow/EnhancedStepTwo";
+import StepThree from "./components/QuestionFlow/StepThree";
+import StepFour from "./components/QuestionFlow/StepFour";
+import EnhancedReviewStep from "./components/QuestionFlow/EnhancedReviewStep";
+import ProgressBar from "./components/ProgressBar";
 
 function App() {
   const [currentStep, setCurrentStep] = useState(0); // Start at 0 for welcome screen
@@ -16,18 +16,24 @@ function App() {
   const totalSteps = 5;
 
   const updateSessionData = (data: Partial<SessionData>) => {
-    setSessionData(prev => ({ ...prev, ...data }));
+    setSessionData((prev) => ({ ...prev, ...data }));
   };
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
-      setCurrentStep(prev => prev + 1);
+      setCurrentStep((prev) => prev + 1);
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1);
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
+
+  const goToStep = (step: number) => {
+    if (step >= 1 && step < currentStep) {
+      setCurrentStep(step);
     }
   };
 
@@ -105,7 +111,11 @@ function App() {
         )}
 
         {currentStep > 0 && (
-          <ProgressBar currentStep={currentStep} totalSteps={totalSteps} />
+          <ProgressBar
+            currentStep={currentStep}
+            totalSteps={totalSteps}
+            onStepClick={goToStep}
+          />
         )}
 
         <div className="max-w-3xl mx-auto mt-8">

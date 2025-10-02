@@ -6,7 +6,6 @@ import { EnhancedAnalysisGenerator } from "../../utils/enhancedAnalysisGenerator
 import { generatePDF } from "../../utils/pdfGenerator";
 import ComparisonView from "../ComparisonView";
 import TrolleyScene from "../TrolleyAnimation/TrolleyScene";
-import Methodology from "../Methodology";
 
 interface EnhancedReviewStepProps {
   data: SessionData;
@@ -21,7 +20,6 @@ const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({
   const [isGenerating, setIsGenerating] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
   const [showScoreDetails, setShowScoreDetails] = useState(false);
-  const [showMethodology, setShowMethodology] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
   const [scores, setScores] = useState<any[]>([]);
 
@@ -104,21 +102,9 @@ const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({
 
   const pathDetails = getPathDetails();
 
-  if (showMethodology) {
-    return (
-      <div className="space-y-6">
-        <Methodology />
-        <div className="flex justify-center">
-          <button
-            onClick={() => setShowMethodology(false)}
-            className="btn-outline"
-          >
-            ← Back to Analysis
-          </button>
-        </div>
-      </div>
-    );
-  }
+  const openMethodology = () => {
+    window.open('/methodology.html', '_blank', 'width=900,height=800,scrollbars=yes');
+  };
 
   if (showComparison && analysis) {
     return (
@@ -392,7 +378,7 @@ const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({
 
           <div className="flex gap-3">
             <motion.button
-              onClick={() => setShowMethodology(true)}
+              onClick={openMethodology}
               className="btn-outline flex items-center gap-2"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
