@@ -396,8 +396,16 @@ const Methodology: React.FC = () => {
       <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <p className="text-sm text-blue-900">
           <strong>Questions about the methodology?</strong> This tool is open source. You can
-          review the complete calculation logic in the source code or reach out to the development
-          team for clarification.
+          review the complete calculation logic in the{" "}
+          <a
+            href="https://github.com/joshuamtm/nonprofit-ai-trolley"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-700 underline hover:text-blue-800 font-medium"
+          >
+            source code
+          </a>{" "}
+          or reach out to the development team for clarification.
         </p>
       </div>
     </div>
