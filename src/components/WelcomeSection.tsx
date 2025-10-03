@@ -209,14 +209,25 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onGetStarted }) => {
           <span className="text-sm">Takes less than 5 minutes to complete</span>
         </div>
 
-        <motion.button
-          onClick={onGetStarted}
-          className="btn-primary text-lg px-8 py-3"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Start Your Assessment →
-        </motion.button>
+        <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+          <motion.button
+            onClick={onGetStarted}
+            className="btn-primary text-lg px-8 py-3"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Start Your Assessment →
+          </motion.button>
+
+          <a
+            href="/methodology"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:text-primary-dark font-medium flex items-center gap-2 px-6 py-3 rounded-lg border-2 border-primary hover:bg-primary hover:text-white transition-colors"
+          >
+            📚 How This Works
+          </a>
+        </div>
 
         <p className="mt-4 text-sm text-gray-500">
           No sign-up required • Your data stays private • Free to use
