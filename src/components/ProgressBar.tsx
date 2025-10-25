@@ -27,8 +27,6 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
       <div className="flex justify-between mb-2">
         {stepNames.map((name, index) => {
           const stepNumber = index + 1;
-          const isCompleted = stepNumber < currentStep;
-          const isCurrent = stepNumber === currentStep;
           const isClickable = onStepClick && stepNumber < currentStep;
 
           return (
