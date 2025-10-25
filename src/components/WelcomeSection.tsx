@@ -38,18 +38,14 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onGetStarted }) => {
       {/* Cat Trolley Video - Fun Intro */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
         <div className="aspect-video w-full">
-          <video
-            className="w-full h-full object-cover"
-            controls
-            preload="metadata"
-            poster="/placeholder-trolley.jpg"
-          >
-            <source src="/cat-trolley.mp4" type="video/mp4" />
-            <p className="p-4 text-gray-600">
-              Your browser doesn't support video playback. The trolley problem meets AI in a fun,
-              engaging way!
-            </p>
-          </video>
+          <iframe
+            className="w-full h-full"
+            src="https://www.youtube.com/embed/x9SyL_B_xbY"
+            title="Cat Trolley Problem - AI Ethics Introduction"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
         </div>
         <div className="p-4 bg-blue-50 border-t border-blue-100">
           <p className="text-sm text-gray-700 text-center">

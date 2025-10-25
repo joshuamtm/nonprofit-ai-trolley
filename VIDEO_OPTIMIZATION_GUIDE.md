@@ -1,10 +1,11 @@
 # Video Optimization Guide
 
-## Current Status
-- **File**: `cat-trolley.mp4`
-- **Size**: 207MB (TOO LARGE for web!)
-- **Location**: `/public/cat-trolley.mp4`
-- **Status**: Embedded in WelcomeSection ✅
+## ✅ SOLUTION IMPLEMENTED: YouTube Embed
+
+**Status**: Using YouTube embed - NO local file needed!
+- **YouTube URL**: https://youtu.be/x9SyL_B_xbY
+- **Embed**: Implemented in WelcomeSection.tsx ✅
+- **Benefits**: Zero bandwidth cost, adaptive streaming, works everywhere
 
 ## Problem
 207MB is far too large for web delivery:
