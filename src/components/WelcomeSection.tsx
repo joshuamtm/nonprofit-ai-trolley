@@ -48,8 +48,29 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onGetStarted }) => {
           />
         </div>
         <div className="p-4 bg-blue-50 border-t border-blue-100">
-          <p className="text-sm text-gray-700 text-center">
+          <p className="text-sm text-gray-700 text-center mb-2">
             🐱 <strong>The Trolley Problem meets AI</strong> - A fun introduction to ethical decision-making
+          </p>
+          <p className="text-xs text-gray-600 text-center">
+            Video by the incredible{' '}
+            <a
+              href="https://youtu.be/181Nj060xMQ?si=hj2LtNkTo8r2h7nX"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:text-primary-dark font-semibold underline"
+            >
+              Answer in Progress
+            </a>
+            {' '}— We highly recommend watching the{' '}
+            <a
+              href="https://youtu.be/181Nj060xMQ?si=hj2LtNkTo8r2h7nX"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:text-primary-dark font-semibold underline"
+            >
+              full video on their channel
+            </a>
+            ! Their thought-provoking content on technology, science, and ethics is absolutely amazing. ✨
           </p>
         </div>
       </div>
