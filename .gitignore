@@ -11,6 +11,10 @@
 # production
 /build
 
+# Large video files (compress before adding - see VIDEO_OPTIMIZATION_GUIDE.md)
+public/*.mp4
+public/cat-trolley.mp4
+
 # misc
 .DS_Store
 .env.local

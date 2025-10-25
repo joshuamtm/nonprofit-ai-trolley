@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SessionData } from "../types";
 import WelcomeSection from "./WelcomeSection";
-import StepOne from "./QuestionFlow/StepOne";
-import EnhancedStepTwo from "./QuestionFlow/EnhancedStepTwo";
-import StepThree from "./QuestionFlow/StepThree";
-import StepFour from "./QuestionFlow/StepFour";
-import EnhancedReviewStep from "./QuestionFlow/EnhancedReviewStep";
 import ProgressBar from "./ProgressBar";
+import LoadingSpinner from "./LoadingSpinner";
+
+// Lazy load assessment steps for better performance
+const StepOne = lazy(() => import("./QuestionFlow/StepOne"));
+const EnhancedStepTwo = lazy(() => import("./QuestionFlow/EnhancedStepTwo"));
+const StepThree = lazy(() => import("./QuestionFlow/StepThree"));
+const StepFour = lazy(() => import("./QuestionFlow/StepFour"));
+const EnhancedReviewStep = lazy(() => import("./QuestionFlow/EnhancedReviewStep"));
 
 const AssessmentFlow: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -128,17 +131,19 @@ const AssessmentFlow: React.FC = () => {
         )}
 
         <div className="max-w-3xl mx-auto mt-8">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {renderStep()}
-            </motion.div>
-          </AnimatePresence>
+          <Suspense fallback={<LoadingSpinner />}>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {renderStep()}
+              </motion.div>
+            </AnimatePresence>
+          </Suspense>
         </div>
       </div>
     </div>

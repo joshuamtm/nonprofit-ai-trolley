@@ -35,6 +35,29 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onGetStarted }) => {
         </div>
       </div>
 
+      {/* Cat Trolley Video - Fun Intro */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+        <div className="aspect-video w-full">
+          <video
+            className="w-full h-full object-cover"
+            controls
+            preload="metadata"
+            poster="/placeholder-trolley.jpg"
+          >
+            <source src="/cat-trolley.mp4" type="video/mp4" />
+            <p className="p-4 text-gray-600">
+              Your browser doesn't support video playback. The trolley problem meets AI in a fun,
+              engaging way!
+            </p>
+          </video>
+        </div>
+        <div className="p-4 bg-blue-50 border-t border-blue-100">
+          <p className="text-sm text-gray-700 text-center">
+            🐱 <strong>The Trolley Problem meets AI</strong> - A fun introduction to ethical decision-making
+          </p>
+        </div>
+      </div>
+
       {/* What This Tool Does */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
