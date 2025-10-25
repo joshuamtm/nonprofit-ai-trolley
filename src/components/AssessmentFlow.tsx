@@ -101,12 +101,12 @@ const AssessmentFlow: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-8"
           >
-            <div className="flex justify-between items-center max-w-3xl mx-auto">
-              <div>
-                <h1 className="text-4xl font-bold text-primary mb-2">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 max-w-3xl mx-auto">
+              <div className="text-center sm:text-left">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-2">
                   The Nonprofit AI Trolley Problem
                 </h1>
-                <p className="text-lg text-gray-600">
+                <p className="text-base sm:text-lg text-gray-600">
                   Navigate the ethical complexities of AI implementation
                 </p>
               </div>
@@ -114,7 +114,7 @@ const AssessmentFlow: React.FC = () => {
                 href="/methodology"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:text-primary-dark font-medium flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-primary hover:bg-primary hover:text-white transition-colors"
+                className="text-primary hover:text-primary-dark font-medium flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-primary hover:bg-primary hover:text-white transition-colors whitespace-nowrap"
               >
                 📚 Methodology
               </a>
