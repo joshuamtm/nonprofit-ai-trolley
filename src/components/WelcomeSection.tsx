@@ -54,7 +54,7 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onGetStarted }) => {
           <p className="text-xs text-gray-600 text-center">
             Video by the incredible{' '}
             <a
-              href="https://youtu.be/181Nj060xMQ?si=hj2LtNkTo8r2h7nX"
+              href="https://www.youtube.com/@answerinprogress"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:text-primary-dark font-semibold underline"
