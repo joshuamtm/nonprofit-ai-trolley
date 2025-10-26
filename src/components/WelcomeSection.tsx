@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Clock, Target, CheckCircle, ChevronDown, ChevronUp, AlertTriangle, Gift, BarChart } from 'lucide-react';
+import { Brain, Clock, Target, CheckCircle, AlertTriangle, Gift, BarChart } from 'lucide-react';
 
 interface WelcomeSectionProps {
   onGetStarted: () => void;
 }
 
 const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onGetStarted }) => {
-  const [showMore, setShowMore] = useState(false);
 
   return (
     <motion.div
@@ -32,46 +31,6 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onGetStarted }) => {
               inspired by the classic trolley problem in ethics.
             </p>
           </div>
-        </div>
-      </div>
-
-      {/* Cat Trolley Video - Fun Intro */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
-        <div className="aspect-video w-full">
-          <iframe
-            className="w-full h-full"
-            src="https://www.youtube.com/embed/x9SyL_B_xbY"
-            title="Cat Trolley Problem - AI Ethics Introduction"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-        </div>
-        <div className="p-4 bg-blue-50 border-t border-blue-100">
-          <p className="text-sm text-gray-700 text-center mb-2">
-            🐱 <strong>The Trolley Problem meets AI</strong> - A fun introduction to ethical decision-making
-          </p>
-          <p className="text-xs text-gray-600 text-center">
-            Video by the incredible{' '}
-            <a
-              href="https://www.youtube.com/@answerinprogress"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-primary-dark font-semibold underline"
-            >
-              Answer in Progress
-            </a>
-            {' '}— We highly recommend watching the{' '}
-            <a
-              href="https://youtu.be/181Nj060xMQ?si=hj2LtNkTo8r2h7nX"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-primary-dark font-semibold underline"
-            >
-              full video on their channel
-            </a>
-            ! Their thought-provoking content on technology, science, and ethics is absolutely amazing. ✨
-          </p>
         </div>
       </div>
 
@@ -201,45 +160,69 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onGetStarted }) => {
         </ul>
       </div>
 
-      {/* The Trolley Problem Context - Collapsible */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-        <button
-          onClick={() => setShowMore(!showMore)}
-          className="w-full flex items-center justify-between text-left"
-        >
-          <h2 className="text-xl font-semibold text-gray-800 flex items-center">
+      {/* Why "The Trolley Problem?" - Video & Explanation */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+        <div className="p-6 pb-0">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
             <AlertTriangle className="w-5 h-5 mr-2 text-yellow-500" />
             Why "The Trolley Problem"?
           </h2>
-          {showMore ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
-          )}
-        </button>
+        </div>
 
-        {showMore && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            className="mt-4 text-gray-600 space-y-3"
-          >
-            <p>
-              The trolley problem is a famous thought experiment in ethics: A runaway trolley is heading toward
-              five people on the tracks. You can pull a lever to divert it to another track, where it will hit
-              only one person. What do you do?
+        {/* Cat Trolley Video */}
+        <div className="px-6 pb-4">
+          <div className="aspect-video w-full rounded-lg overflow-hidden">
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/x9SyL_B_xbY"
+              title="Cat Trolley Problem - AI Ethics Introduction"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          </div>
+          <div className="mt-3">
+            <p className="text-xs text-gray-600 text-center">
+              Video by the incredible{' '}
+              <a
+                href="https://www.youtube.com/@answerinprogress"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-primary-dark font-semibold underline"
+              >
+                Answer in Progress
+              </a>
+              {' '}— We highly recommend watching the{' '}
+              <a
+                href="https://youtu.be/181Nj060xMQ?si=hj2LtNkTo8r2h7nX"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary hover:text-primary-dark font-semibold underline"
+              >
+                full video on their channel
+              </a>
+              ! Their thought-provoking content on technology, science, and ethics is absolutely amazing. ✨
             </p>
-            <p>
-              <strong>AI adoption presents a similar dilemma:</strong> Implementing AI might help you serve many more
-              beneficiaries (saving the five), but it could risk job displacement, bias, or loss of human
-              connection (harming the one). There's no perfect answer—only trade-offs to consider carefully.
-            </p>
-            <p className="text-sm italic">
-              This tool helps you explore these ethical trade-offs in the context of your specific organization
-              and make an informed decision aligned with your values.
-            </p>
-          </motion.div>
-        )}
+          </div>
+        </div>
+
+        {/* Explanation */}
+        <div className="px-6 pb-6 text-gray-600 space-y-3">
+          <p>
+            The trolley problem is a famous thought experiment in ethics: A runaway trolley is heading toward
+            five people on the tracks. You can pull a lever to divert it to another track, where it will hit
+            only one person. What do you do?
+          </p>
+          <p>
+            <strong>AI adoption presents a similar dilemma:</strong> Implementing AI might help you serve many more
+            beneficiaries (saving the five), but it could risk job displacement, bias, or loss of human
+            connection (harming the one). There's no perfect answer—only trade-offs to consider carefully.
+          </p>
+          <p className="text-sm italic">
+            This tool helps you explore these ethical trade-offs in the context of your specific organization
+            and make an informed decision aligned with your values.
+          </p>
+        </div>
       </div>
 
       {/* Time Estimate & CTA */}
