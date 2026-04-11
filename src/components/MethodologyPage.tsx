@@ -2,243 +2,209 @@ import React from "react";
 
 const MethodologyPage: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 to-indigo-800 text-white">
-      <header className="bg-black bg-opacity-20 py-6 px-4 border-b border-white border-opacity-10">
-        <div className="container mx-auto max-w-4xl">
-          <h1 className="text-4xl font-bold mb-2">
-            The Nonprofit AI Trolley Problem - Methodology
+    <div className="min-h-screen bg-background text-textDark">
+      <header className="bg-primary py-8 px-4">
+        <div className="container mx-auto max-w-3xl">
+          <h1 className="font-display text-3xl text-white mb-2">
+            Methodology
           </h1>
-          <p className="text-lg opacity-90">
-            Understanding how this assessment works and why it matters
+          <p className="text-lg text-white/80">
+            How this assessment works and why it matters
           </p>
         </div>
       </header>
 
-      <main className="container mx-auto max-w-4xl px-4 py-12">
-        <section className="bg-white text-gray-900 rounded-lg p-8 mb-8 shadow-xl">
-          <h2 className="text-3xl font-bold text-purple-700 mb-4">
+      <main className="container mx-auto max-w-3xl px-4 py-12 space-y-8">
+        <section className="card">
+          <h2 className="font-display text-2xl text-primary mb-4">
             What is This Assessment?
           </h2>
-          <p className="text-lg leading-relaxed mb-4">
+          <p className="text-base leading-relaxed mb-4">
             The Nonprofit AI Trolley Problem is an interactive assessment tool designed to help
             nonprofit organizations navigate the complex ethical landscape of AI implementation.
             Named after the classic "trolley problem" in ethics, this tool acknowledges that
-            AI decisions rarely have perfect solutions—they involve tradeoffs, competing values,
+            AI decisions rarely have perfect solutions — they involve trade-offs, competing values,
             and real consequences.
           </p>
-          <p className="text-lg leading-relaxed">
+          <p className="text-base leading-relaxed">
             Rather than providing simple yes/no answers, we help you understand the full spectrum
             of considerations, risks, and opportunities specific to your context.
           </p>
         </section>
 
-        <section className="bg-white text-gray-900 rounded-lg p-8 mb-8 shadow-xl">
-          <h2 className="text-3xl font-bold text-purple-700 mb-4">The Five Phases</h2>
+        <section className="card">
+          <h2 className="font-display text-2xl text-primary mb-4">The Five Phases</h2>
 
           <div className="space-y-6">
-            <div className="border-l-4 border-purple-500 pl-4">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-purple-500 text-white font-bold">
-                  1
-                </span>
-                <h3 className="text-2xl font-semibold">Context</h3>
+            {[
+              {
+                num: 1,
+                title: "Context",
+                desc: "We gather essential information about your organization: mission focus, type, annual budget size, and current situation. This contextualizes all recommendations and ensures budget estimates are grounded in your reality.",
+              },
+              {
+                num: 2,
+                title: "AI Initiative",
+                desc: "You describe the specific AI application you're considering (or tell us you're still exploring), what success would look like, your expected timeline, and intended scale of deployment. This helps us understand your goals and constraints.",
+              },
+              {
+                num: 3,
+                title: "Concerns",
+                desc: "We explore your specific worries about AI — from algorithmic bias and data privacy to job displacement and technology dependency. You rate each concern on a 1-5 scale, giving us a nuanced picture of where your organization's ethical priorities lie.",
+              },
+              {
+                num: 4,
+                title: "Readiness Assessment",
+                desc: "You assess your organization's readiness across four dimensions: technical infrastructure, change management capacity, ethical framework maturity, and data governance. Combined with urgency and stakeholder readiness, this shapes whether we recommend cautious pilots or bolder approaches.",
+              },
+              {
+                num: 5,
+                title: "Personalized Analysis",
+                desc: "We synthesize everything into a personalized three-path recommendation. An AI advisor analyzes your specific situation — including your mission statement and use case description — to generate tailored benefits, risks, action plans, and budget estimates for each path.",
+              },
+            ].map((phase) => (
+              <div key={phase.num} className="flex gap-4">
+                <div className="flex-shrink-0 w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm">
+                  {phase.num}
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold mb-1">{phase.title}</h3>
+                  <p className="text-sm text-text-muted leading-relaxed">{phase.desc}</p>
+                </div>
               </div>
-              <p className="text-gray-700 ml-13">
-                We gather essential information about your organization: mission focus, size,
-                budget, and current AI experience. This contextualizes all recommendations.
+            ))}
+          </div>
+        </section>
+
+        <section className="card">
+          <h2 className="font-display text-2xl text-primary mb-4">
+            The Three Paths
+          </h2>
+          <p className="text-base leading-relaxed mb-6">
+            Every assessment produces analysis for all three paths, regardless of the recommendation.
+            Each path is presented as a legitimate strategic choice with genuine trade-offs:
+          </p>
+
+          <div className="space-y-4">
+            <div className="p-4 rounded-xl border-2 border-signal-green/20 bg-signal-green/5">
+              <h3 className="font-semibold text-signal-green mb-1">Path 1: Implement AI (Pull the Lever)</h3>
+              <p className="text-sm text-text-muted">
+                Move forward with full implementation, accepting calculated risks for maximum potential benefit.
+                Best for organizations with high urgency, strong readiness, and aligned stakeholders.
               </p>
             </div>
-
-            <div className="border-l-4 border-indigo-500 pl-4">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-indigo-500 text-white font-bold">
-                  2
-                </span>
-                <h3 className="text-2xl font-semibold">AI Initiative</h3>
-              </div>
-              <p className="text-gray-700 ml-13">
-                You describe the specific AI application you're considering and what success
-                would look like. This helps us understand your goals and constraints.
+            <div className="p-4 rounded-xl border-2 border-signal-blue/20 bg-signal-blue/5">
+              <h3 className="font-semibold text-signal-blue mb-1">Path 2: Maintain Current Approach (Don't Pull)</h3>
+              <p className="text-sm text-text-muted">
+                Continue without AI, focusing on optimizing current processes and building readiness for the future.
+                This is a valid strategic choice, not a failure — especially when concerns are high and urgency is low.
               </p>
             </div>
-
-            <div className="border-l-4 border-blue-500 pl-4">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-500 text-white font-bold">
-                  3
-                </span>
-                <h3 className="text-2xl font-semibold">Concerns</h3>
-              </div>
-              <p className="text-gray-700 ml-13">
-                We explore your specific worries about AI—from bias and privacy to cost and
-                complexity. Acknowledging concerns is crucial for responsible implementation.
-              </p>
-            </div>
-
-            <div className="border-l-4 border-cyan-500 pl-4">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-cyan-500 text-white font-bold">
-                  4
-                </span>
-                <h3 className="text-2xl font-semibold">Risk Tolerance</h3>
-              </div>
-              <p className="text-gray-700 ml-13">
-                You indicate your organization's capacity for experimentation, failure, and
-                change. This shapes whether we recommend cautious pilots or bolder approaches.
-              </p>
-            </div>
-
-            <div className="border-l-4 border-teal-500 pl-4">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-teal-500 text-white font-bold">
-                  5
-                </span>
-                <h3 className="text-2xl font-semibold">Review & Generate Report</h3>
-              </div>
-              <p className="text-gray-700 ml-13">
-                We synthesize everything into personalized recommendations, including specific
-                next steps, risk mitigation strategies, and resources tailored to your situation.
+            <div className="p-4 rounded-xl border-2 border-signal-amber/20 bg-signal-amber/5">
+              <h3 className="font-semibold text-signal-amber mb-1">Path 3: Implement with Safeguards (Pull with Care)</h3>
+              <p className="text-sm text-text-muted">
+                Phased implementation with comprehensive safeguards, ethics oversight, and built-in evaluation points.
+                Balances innovation with risk management — the most commonly recommended path.
               </p>
             </div>
           </div>
         </section>
 
-        <section className="bg-white text-gray-900 rounded-lg p-8 mb-8 shadow-xl">
-          <h2 className="text-3xl font-bold text-purple-700 mb-4">
+        <section className="card">
+          <h2 className="font-display text-2xl text-primary mb-4">
             Understanding Impact Scores
           </h2>
-          <p className="text-lg leading-relaxed mb-4">
-            Throughout the assessment, you'll see references to "impact scores" or success metrics
-            like "serve 2,000 more families" or "$750,000 in additional revenue." These quantifiable
-            measures help us understand potential benefits—but they're not the whole story.
+          <p className="text-base leading-relaxed mb-4">
+            Each path receives an impact score (0-100) based on your inputs. However, the
+            highest score doesn't always mean the best choice. This is intentional:
           </p>
 
-          <h3 className="text-2xl font-semibold text-purple-600 mt-6 mb-3">
-            Why Highest Impact Doesn't Always Mean Best Choice
-          </h3>
-          <p className="text-lg leading-relaxed mb-4">
-            You may notice that recommendations don't always align with the option showing the
-            highest measurable impact. This is intentional and reflects the reality of nonprofit
-            decision-making:
-          </p>
-
-          <ul className="space-y-4 mb-6">
-            <li className="flex gap-3">
-              <span className="text-2xl flex-shrink-0">🎯</span>
-              <div>
-                <strong className="text-lg">Impact scores measure quantity, not quality</strong>
-                <p className="text-gray-700 mt-1">
-                  Serving 2,000 more families sounds impressive—but not if it means abandoning
-                  200 of your most vulnerable clients who need intensive support.
-                </p>
-              </div>
-            </li>
-
-            <li className="flex gap-3">
-              <span className="text-2xl flex-shrink-0">⚖️</span>
-              <div>
-                <strong className="text-lg">Ethical considerations transcend metrics</strong>
-                <p className="text-gray-700 mt-1">
-                  Privacy violations, algorithmic bias, and mission drift can't always be
-                  reduced to numbers on a spreadsheet.
-                </p>
-              </div>
-            </li>
-
-            <li className="flex gap-3">
-              <span className="text-2xl flex-shrink-0">⚠️</span>
-              <div>
-                <strong className="text-lg">Risk and harm matter</strong>
-                <p className="text-gray-700 mt-1">
-                  A 2% error rate sounds acceptable until you realize it means falsely flagging
-                  hundreds of youth as "crisis cases," potentially traumatizing them.
-                </p>
-              </div>
-            </li>
-
-            <li className="flex gap-3">
-              <span className="text-2xl flex-shrink-0">🌱</span>
-              <div>
-                <strong className="text-lg">Organizational values are paramount</strong>
-                <p className="text-gray-700 mt-1">
-                  An environmental justice nonprofit might reject $750,000 in AI-generated grant
-                  funding if obtaining it conflicts with their carbon-neutral commitment to the
-                  communities they serve.
-                </p>
-              </div>
-            </li>
-
-            <li className="flex gap-3">
-              <span className="text-2xl flex-shrink-0">🤝</span>
-              <div>
-                <strong className="text-lg">Trust and relationships are invaluable</strong>
-                <p className="text-gray-700 mt-1">
-                  Short-term efficiency gains mean nothing if they erode community trust that
-                  took years or decades to build.
-                </p>
-              </div>
-            </li>
+          <ul className="space-y-3 mb-6">
+            {[
+              { title: "Impact scores measure quantity, not quality", desc: "Serving 2,000 more families sounds impressive — but not if it means abandoning 200 of your most vulnerable clients who need intensive support." },
+              { title: "Ethical considerations transcend metrics", desc: "Privacy violations, algorithmic bias, and mission drift can't always be reduced to numbers on a spreadsheet." },
+              { title: "Organizational values are paramount", desc: "An environmental justice nonprofit might reject efficiency gains if obtaining them conflicts with their commitments to the communities they serve." },
+              { title: "Trust and relationships are invaluable", desc: "Short-term efficiency gains mean nothing if they erode community trust that took years to build." },
+            ].map((item, i) => (
+              <li key={i} className="flex gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2.5 flex-shrink-0" />
+                <div>
+                  <strong className="text-sm">{item.title}</strong>
+                  <p className="text-sm text-text-muted mt-0.5">{item.desc}</p>
+                </div>
+              </li>
+            ))}
           </ul>
 
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded">
-            <div className="flex gap-3">
-              <span className="text-2xl flex-shrink-0">💡</span>
-              <div>
-                <h4 className="text-xl font-semibold text-gray-900 mb-2">Key Insight</h4>
-                <p className="text-gray-800 leading-relaxed">
-                  The "best" choice isn't always the one with the biggest numbers. Nonprofit
-                  leadership requires weighing quantifiable impact against ethical principles,
-                  community relationships, organizational mission, and long-term sustainability.
-                  This assessment helps you navigate those tradeoffs thoughtfully.
-                </p>
-              </div>
-            </div>
+          <div className="bg-primary/5 border-l-3 border-primary/30 p-4 rounded-r-xl" style={{ borderLeftWidth: '3px' }}>
+            <h4 className="font-semibold text-sm text-primary mb-1">Key Insight</h4>
+            <p className="text-sm text-text-muted leading-relaxed">
+              The "best" choice isn't always the one with the biggest numbers. Nonprofit
+              leadership requires weighing quantifiable impact against ethical principles,
+              community relationships, organizational mission, and long-term sustainability.
+            </p>
           </div>
         </section>
 
-        <section className="bg-white text-gray-900 rounded-lg p-8 mb-8 shadow-xl">
-          <h2 className="text-3xl font-bold text-purple-700 mb-4">How Recommendations Are Generated</h2>
-          <p className="text-lg leading-relaxed mb-4">
-            Our recommendations are based on:
+        <section className="card">
+          <h2 className="font-display text-2xl text-primary mb-4">How Recommendations Are Generated</h2>
+          <p className="text-base leading-relaxed mb-4">
+            Your personalized analysis is generated using AI (Claude by Anthropic) that evaluates
+            your specific inputs against nonprofit AI adoption best practices. The analysis considers:
           </p>
-          <ul className="list-disc list-inside space-y-2 text-lg ml-4">
-            <li>Your organization's specific context and constraints</li>
-            <li>Current best practices in responsible AI deployment</li>
-            <li>Risk-benefit analysis tailored to nonprofit settings</li>
-            <li>Ethical frameworks from AI ethics research</li>
-            <li>Real-world implementation patterns from similar organizations</li>
+          <ul className="space-y-2 text-sm ml-4">
+            {[
+              "Your organization's specific context, mission, and constraints",
+              "The AI initiative type, scale, and timeline you described",
+              "Your concern ratings and their relative priorities",
+              "Organizational readiness across four dimensions",
+              "Current best practices in responsible AI deployment for nonprofits",
+              "Ethical frameworks from AI ethics research",
+            ].map((item, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="text-primary">-</span>
+                <span>{item}</span>
+              </li>
+            ))}
           </ul>
-          <p className="text-lg leading-relaxed mt-4">
-            Each recommendation includes specific next steps, potential pitfalls to avoid,
-            and resources to support implementation.
+          <p className="text-sm text-text-muted mt-4">
+            If the AI analysis is temporarily unavailable, a template-based analysis engine
+            provides recommendations using the same scoring methodology.
           </p>
         </section>
 
-        <section className="bg-white text-gray-900 rounded-lg p-8 shadow-xl">
-          <h2 className="text-3xl font-bold text-purple-700 mb-4">Privacy & Data Use</h2>
-          <p className="text-lg leading-relaxed mb-4">
-            Your responses are used only to generate your personalized report. We do not:
+        <section className="card">
+          <h2 className="font-display text-2xl text-primary mb-4">Privacy & Data Use</h2>
+          <p className="text-base leading-relaxed mb-4">
+            Your assessment data is:
           </p>
-          <ul className="list-disc list-inside space-y-2 text-lg ml-4">
-            <li>Share your data with third parties</li>
-            <li>Use your responses for marketing purposes</li>
-            <li>Store personally identifiable information beyond what you choose to save</li>
+          <ul className="space-y-2 text-sm ml-4">
+            {[
+              "Sent securely to generate your personalized analysis via AI (Claude by Anthropic)",
+              "Not stored on our servers after your report is generated",
+              "Not shared with third parties beyond the AI analysis provider",
+              "Not used for marketing purposes",
+              "Saved locally in your browser so you don't lose progress (cleared when you clear browser data)",
+            ].map((item, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="text-primary">-</span>
+                <span>{item}</span>
+              </li>
+            ))}
           </ul>
-          <p className="text-lg leading-relaxed mt-4">
-            Anonymous, aggregated data may be used to improve the assessment tool and inform
-            research on AI ethics in nonprofits.
+          <p className="text-sm text-text-muted mt-4">
+            Your downloadable PDF report is generated entirely in your browser and is never
+            uploaded to any server. Only you have access to it.
           </p>
         </section>
       </main>
 
-      <footer className="bg-black bg-opacity-30 py-8 px-4 mt-12 border-t border-white border-opacity-10">
-        <div className="container mx-auto max-w-4xl text-center">
-          <p className="text-lg opacity-90">
-            Developed by <strong>Meet the Moment</strong>
-          </p>
-          <p className="opacity-75 mt-2">
-            <a href="https://mtm.now" target="_blank" rel="noopener noreferrer" className="underline hover:text-yellow-300">
-              mtm.now
+      <footer className="bg-primary/5 py-6 px-4 mt-8 border-t border-rail-light">
+        <div className="container mx-auto max-w-3xl text-center">
+          <p className="text-sm text-text-muted">
+            Developed by{" "}
+            <a href="https://mtm.now" target="_blank" rel="noopener noreferrer" className="text-primary font-semibold hover:underline">
+              Meet the Moment
             </a>
           </p>
         </div>

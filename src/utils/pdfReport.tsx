@@ -5,20 +5,11 @@ import {
   Text,
   View,
   StyleSheet,
-  Font,
   pdf,
 } from "@react-pdf/renderer";
 import { SessionData, PathAnalysis } from "../types";
 
-// Register fonts
-Font.register({
-  family: "Source Sans",
-  fonts: [
-    { src: "https://fonts.gstatic.com/s/sourcesans3/v15/nwpBtKy2OAdR1K-IwhWudF-R9QMylBJAV3Bo8Kw461EN_io6npfB.ttf", fontWeight: 400 },
-    { src: "https://fonts.gstatic.com/s/sourcesans3/v15/nwpBtKy2OAdR1K-IwhWudF-R9QMylBJAV3Bo8Ky761EN_io6npfB.ttf", fontWeight: 600 },
-    { src: "https://fonts.gstatic.com/s/sourcesans3/v15/nwpBtKy2OAdR1K-IwhWudF-R9QMylBJAV3Bo8Kzf61EN_io6npfB.ttf", fontWeight: 700 },
-  ],
-});
+// Use Helvetica (built into react-pdf) — no external font fetching needed
 
 const colors = {
   primary: "#1B4D3E",
@@ -36,7 +27,7 @@ const colors = {
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "Source Sans",
+    fontFamily: "Helvetica",
     fontSize: 10,
     paddingTop: 50,
     paddingBottom: 50,
@@ -46,7 +37,7 @@ const styles = StyleSheet.create({
   },
   // Cover page
   coverPage: {
-    fontFamily: "Source Sans",
+    fontFamily: "Helvetica",
     backgroundColor: colors.primary,
     display: "flex",
     justifyContent: "center",
@@ -217,7 +208,7 @@ const BulletList = ({ items, color }: { items: string[]; color?: string }) => (
   <View>
     {items.map((item, i) => (
       <View key={i} style={styles.bulletItem}>
-        <Text style={[styles.bullet, color ? { color } : {}]}>•</Text>
+        <Text style={[styles.bullet, color ? { color } : {}]}>-</Text>
         <Text style={styles.bulletText}>{item}</Text>
       </View>
     ))}
@@ -268,7 +259,7 @@ const PathSection = ({
       {isRecommended && (
         <View style={{ backgroundColor: "#E8F5E9", borderRadius: 4, padding: 6, marginBottom: 8 }}>
           <Text style={{ fontSize: 9, fontWeight: 600, color: colors.signalGreen }}>
-            ✓ RECOMMENDED PATH
+            RECOMMENDED PATH
           </Text>
         </View>
       )}
@@ -390,7 +381,9 @@ const TrolleyReport: React.FC<ReportProps> = ({ data, analysis }) => {
     <Document>
       {/* Cover Page */}
       <Page size="LETTER" style={styles.coverPage}>
-        <Text style={coverIcon}>🚂</Text>
+        <Text style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", textAlign: "center", marginBottom: 24, letterSpacing: 4 }}>
+          - - -
+        </Text>
         <Text style={styles.coverTitle}>
           Your AI Decision Analysis
         </Text>
@@ -529,12 +522,6 @@ const TrolleyReport: React.FC<ReportProps> = ({ data, analysis }) => {
       </Page>
     </Document>
   );
-};
-
-const coverIcon: any = {
-  fontSize: 48,
-  textAlign: "center",
-  marginBottom: 20,
 };
 
 // Export function to generate and download
