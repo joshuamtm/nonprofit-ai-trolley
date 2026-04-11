@@ -12,57 +12,95 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   totalSteps,
   onStepClick,
 }) => {
-  const progress = (currentStep / totalSteps) * 100;
-
   const stepNames = [
     "Context",
     "AI Initiative",
     "Concerns",
-    "Risk Tolerance",
-    "Review & Generate",
+    "Readiness",
+    "Analysis",
   ];
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      <div className="flex justify-between mb-2">
-        {stepNames.map((name, index) => {
-          const stepNumber = index + 1;
-          const isClickable = onStepClick && stepNumber < currentStep;
+    <div className="w-full max-w-3xl mx-auto px-4">
+      {/* Railway track progress */}
+      <div className="relative">
+        {/* Track rail lines */}
+        <div className="absolute top-4 left-0 right-0 h-0.5 bg-rail-light" />
+        <div className="absolute top-4 left-0 right-0">
+          <motion.div
+            className="h-0.5 bg-primary"
+            initial={{ width: 0 }}
+            animate={{ width: `${((currentStep - 1) / (totalSteps - 1)) * 100}%` }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          />
+        </div>
 
-          return (
+        {/* Sleeper ties (subtle cross marks along the track) */}
+        <div className="absolute top-2.5 left-0 right-0 flex justify-between px-[4%]">
+          {Array.from({ length: 20 }).map((_, i) => (
             <div
-              key={index}
-              className={`text-xs font-medium ${
-                stepNumber <= currentStep ? "text-primary" : "text-gray-400"
-              }`}
-            >
+              key={i}
+              className="w-0.5 h-3 bg-rail-light rounded-full"
+            />
+          ))}
+        </div>
+
+        {/* Station stops */}
+        <div className="relative flex justify-between">
+          {stepNames.map((name, index) => {
+            const stepNumber = index + 1;
+            const isCompleted = stepNumber < currentStep;
+            const isCurrent = stepNumber === currentStep;
+            const isClickable = onStepClick && stepNumber < currentStep;
+
+            return (
               <div
-                onClick={() => isClickable && onStepClick(stepNumber)}
-                className={`w-8 h-8 rounded-full flex items-center justify-center mb-1 ${
-                  stepNumber <= currentStep
-                    ? "bg-primary text-white"
-                    : "bg-gray-200 text-gray-500"
-                } ${isClickable ? "cursor-pointer hover:bg-primary-dark hover:scale-110 transition-all" : ""}`}
-                title={isClickable ? `Go back to ${name}` : ""}
+                key={index}
+                className="flex flex-col items-center"
+                style={{ width: `${100 / totalSteps}%` }}
               >
-                {stepNumber}
+                {/* Station marker */}
+                <motion.div
+                  onClick={() => isClickable && onStepClick(stepNumber)}
+                  className={`
+                    relative z-10 w-8 h-8 rounded-full flex items-center justify-center
+                    text-xs font-semibold border-2 transition-all duration-300
+                    ${isCurrent
+                      ? 'bg-primary border-primary text-white shadow-md'
+                      : isCompleted
+                        ? 'bg-primary border-primary text-white'
+                        : 'bg-background border-rail-light text-text-muted'
+                    }
+                    ${isClickable ? 'cursor-pointer hover:scale-110 hover:shadow-lg' : ''}
+                  `}
+                  title={isClickable ? `Go back to ${name}` : ""}
+                  initial={false}
+                  animate={isCurrent ? { scale: [1, 1.1, 1] } : {}}
+                  transition={{ duration: 0.4 }}
+                >
+                  {isCompleted ? (
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    stepNumber
+                  )}
+                </motion.div>
+
+                {/* Station label */}
+                <span
+                  className={`mt-2 text-xs font-medium text-center leading-tight ${
+                    isCurrent ? 'text-primary' : isCompleted ? 'text-primary/70' : 'text-text-muted'
+                  }`}
+                >
+                  <span className="hidden sm:inline">{name}</span>
+                  <span className="sm:hidden">{stepNumber}</span>
+                </span>
               </div>
-              <span className="hidden sm:inline">{name}</span>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-      <div className="progress-step">
-        <motion.div
-          className="progress-fill"
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
-        />
-      </div>
-      <p className="text-center mt-2 text-sm text-gray-600">
-        Step {currentStep} of {totalSteps}
-      </p>
     </div>
   );
 };

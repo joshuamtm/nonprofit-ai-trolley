@@ -47,14 +47,14 @@ export class EnhancedAnalysisGenerator {
         riskScore > 0.6 ? "High caution needed" : "Moderate risk tolerance",
     });
 
-    // Urgency Score
+    // Urgency Score (aligned with dropdown: critical/important/exploratory)
     const urgencyValue =
       this.data.problemUrgency === "critical"
         ? 1.0
-        : this.data.problemUrgency === "high"
-          ? 0.75
-          : this.data.problemUrgency === "moderate"
-            ? 0.5
+        : this.data.problemUrgency === "important"
+          ? 0.65
+          : this.data.problemUrgency === "exploratory"
+            ? 0.3
             : 0.25;
 
     scores.push({
@@ -67,12 +67,12 @@ export class EnhancedAnalysisGenerator {
           : "Time for careful planning",
     });
 
-    // Readiness Score
+    // Readiness Score (now collected from Step 4 instead of defaulting to 3)
     const readinessFactors = [
-      this.data.technicalReadiness || 3,
-      this.data.changeManagementCapacity || 3,
-      this.data.ethicalFrameworkMaturity || 3,
-      this.data.dataGovernanceStatus || 3,
+      this.data.technicalReadiness,
+      this.data.changeManagementCapacity,
+      this.data.ethicalFrameworkMaturity,
+      this.data.dataGovernanceStatus,
     ];
     const readinessScore =
       readinessFactors.reduce((a, b) => a + b) / (readinessFactors.length * 5);
@@ -87,12 +87,12 @@ export class EnhancedAnalysisGenerator {
           : "Significant preparation needed",
     });
 
-    // Stakeholder Alignment Score
+    // Stakeholder Alignment Score (aligned with dropdown: eager/cautious/skeptical/resistant)
     const alignmentValue =
-      this.data.stakeholderReadiness === "enthusiastic"
+      this.data.stakeholderReadiness === "eager"
         ? 1.0
-        : this.data.stakeholderReadiness === "supportive"
-          ? 0.75
+        : this.data.stakeholderReadiness === "cautious"
+          ? 0.7
           : this.data.stakeholderReadiness === "skeptical"
             ? 0.4
             : 0.2;
@@ -463,29 +463,45 @@ export class EnhancedAnalysisGenerator {
     ongoing: string;
     total: string;
   } {
-    const orgSize =
-      this.data.organizationType === "large"
-        ? 3
-        : this.data.organizationType === "medium"
-          ? 2
-          : 1;
+    // Use organizationSize (small/medium/large/enterprise) for budget scaling
+    const sizeMultiplier =
+      this.data.organizationSize === "enterprise"
+        ? 4
+        : this.data.organizationSize === "large"
+          ? 3
+          : this.data.organizationSize === "medium"
+            ? 2
+            : 1;
+
+    const formatRange = (low: number, high: number) => {
+      const fmt = (n: number) => n >= 1000 ? `$${(n / 1000).toFixed(0)}K` : `$${n.toLocaleString()}`;
+      return `${fmt(low)}-${fmt(high)}`;
+    };
 
     if (implementation === "full") {
+      const initLow = sizeMultiplier * 40000;
+      const initHigh = sizeMultiplier * 90000;
+      const ongoingLow = sizeMultiplier * 15000;
+      const ongoingHigh = sizeMultiplier * 35000;
       return {
-        initial: `$${orgSize * 50000}-${orgSize * 100000}`,
-        ongoing: `$${orgSize * 20000}-${orgSize * 40000}/year`,
-        total: `$${orgSize * 150000}-${orgSize * 300000} over 3 years`,
+        initial: formatRange(initLow, initHigh),
+        ongoing: `${formatRange(ongoingLow, ongoingHigh)}/year`,
+        total: `${formatRange(initLow + ongoingLow * 3, initHigh + ongoingHigh * 3)} over 3 years`,
       };
     } else if (implementation === "phased") {
+      const initLow = sizeMultiplier * 15000;
+      const initHigh = sizeMultiplier * 35000;
+      const ongoingLow = sizeMultiplier * 10000;
+      const ongoingHigh = sizeMultiplier * 25000;
       return {
-        initial: `$${orgSize * 20000}-${orgSize * 40000}`,
-        ongoing: `$${orgSize * 15000}-${orgSize * 30000}/year`,
-        total: `$${orgSize * 80000}-${orgSize * 160000} over 3 years`,
+        initial: formatRange(initLow, initHigh),
+        ongoing: `${formatRange(ongoingLow, ongoingHigh)}/year`,
+        total: `${formatRange(initLow + ongoingLow * 3, initHigh + ongoingHigh * 3)} over 3 years`,
       };
     } else {
       return {
-        initial: "$0",
-        ongoing: "Current operational costs",
+        initial: "$0 for AI",
+        ongoing: "Current operational costs + potential staff additions",
         total: "No additional AI investment",
       };
     }

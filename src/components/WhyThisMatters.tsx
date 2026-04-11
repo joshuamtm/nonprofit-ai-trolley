@@ -10,23 +10,23 @@ interface WhyThisMattersProps {
 const WhyThisMatters: React.FC<WhyThisMattersProps> = ({ content, influences }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, x: -20 }}
+      initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg"
+      className="mt-4 p-4 bg-primary/5 border-l-3 border-primary/30 rounded-r-xl"
+      style={{ borderLeftWidth: '3px' }}
     >
-      <div className="flex items-start">
-        <Lightbulb className="w-5 h-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" />
+      <div className="flex items-start gap-2.5">
+        <Lightbulb className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
         <div>
-          <h4 className="font-semibold text-sm text-yellow-800 mb-1">Why This Matters</h4>
-          <p className="text-sm text-yellow-700">{content}</p>
+          <h4 className="font-semibold text-xs text-primary mb-1 uppercase tracking-wide">Why This Matters</h4>
+          <p className="text-sm text-textDark/80">{content}</p>
           {influences && influences.length > 0 && (
-            <div className="mt-2">
-              <p className="text-xs font-medium text-yellow-800 mb-1">This influences:</p>
-              <ul className="text-xs text-yellow-700 space-y-0.5">
-                {influences.map((influence, index) => (
-                  <li key={index}>• {influence}</li>
-                ))}
-              </ul>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {influences.map((influence, index) => (
+                <span key={index} className="text-xs px-2 py-0.5 bg-primary/8 text-primary/80 rounded-md">
+                  {influence}
+                </span>
+              ))}
             </div>
           )}
         </div>

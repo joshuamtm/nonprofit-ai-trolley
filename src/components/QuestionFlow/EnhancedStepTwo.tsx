@@ -41,6 +41,7 @@ const EnhancedStepTwo: React.FC<EnhancedStepTwoProps> = ({
       expectedOutcomes: data.expectedOutcomes || [],
       implementationTimeline: data.implementationTimeline || "",
       impactScale: data.impactScale || "",
+      explorationStage: data.explorationStage || "evaluating",
     },
   });
 
@@ -169,6 +170,7 @@ const EnhancedStepTwo: React.FC<EnhancedStepTwoProps> = ({
       expectedOutcomes: formData.expectedOutcomes,
       implementationTimeline: formData.implementationTimeline,
       impactScale: formData.impactScale,
+      explorationStage: formData.explorationStage,
     });
     onNext();
   };
@@ -192,6 +194,36 @@ const EnhancedStepTwo: React.FC<EnhancedStepTwoProps> = ({
       />
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
+        {/* Exploration Stage */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Where are you in your AI journey?
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {[
+              { value: 'exploring', label: 'Exploring', description: "I'm curious about AI but don't have a specific initiative in mind" },
+              { value: 'evaluating', label: 'Evaluating', description: "I'm considering a specific AI initiative and want to assess it" },
+              { value: 'ready', label: 'Ready to Act', description: "I've done my research and want a decision framework" },
+            ].map((stage) => (
+              <label
+                key={stage.value}
+                className="flex items-start p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  value={stage.value}
+                  {...register('explorationStage')}
+                  className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                />
+                <div className="ml-3">
+                  <span className="text-sm font-medium text-gray-700">{stage.label}</span>
+                  <span className="block text-xs text-gray-500">{stage.description}</span>
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+
         {/* AI Initiative Types with Expandable Descriptions */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">

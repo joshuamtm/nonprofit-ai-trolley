@@ -13,6 +13,7 @@ const StepOne: React.FC<StepOneProps> = ({ data, updateData, onNext }) => {
   const { register, handleSubmit, formState: { errors } } = useForm({
     defaultValues: {
       organizationType: data.organizationType || '',
+      organizationSize: data.organizationSize || '',
       organizationMission: data.organizationMission || ''
     }
   });
@@ -20,6 +21,7 @@ const StepOne: React.FC<StepOneProps> = ({ data, updateData, onNext }) => {
   const onSubmit = (formData: any) => {
     updateData({
       organizationType: formData.organizationType,
+      organizationSize: formData.organizationSize,
       organizationMission: formData.organizationMission
     });
     onNext();
@@ -47,10 +49,33 @@ const StepOne: React.FC<StepOneProps> = ({ data, updateData, onNext }) => {
             <option value="education">Education/Youth Development</option>
             <option value="crisis">Crisis Support/Emergency Response</option>
             <option value="community">Community Development</option>
+            <option value="arts">Arts/Culture</option>
+            <option value="advocacy">Advocacy/Policy</option>
+            <option value="faith">Faith-Based</option>
+            <option value="foundation">Foundation/Grantmaker</option>
             <option value="other">Other</option>
           </select>
           {errors.organizationType && (
             <p className="mt-1 text-sm text-red-600">{errors.organizationType.message}</p>
+          )}
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            What is your organization's approximate annual budget?
+          </label>
+          <select
+            {...register('organizationSize', { required: 'Please select a budget range' })}
+            className="input-field"
+          >
+            <option value="">Select a range...</option>
+            <option value="small">Under $2 million</option>
+            <option value="medium">$2 million – $15 million</option>
+            <option value="large">$15 million – $50 million</option>
+            <option value="enterprise">Over $50 million</option>
+          </select>
+          {errors.organizationSize && (
+            <p className="mt-1 text-sm text-red-600">{errors.organizationSize.message}</p>
           )}
         </div>
 
@@ -62,8 +87,8 @@ const StepOne: React.FC<StepOneProps> = ({ data, updateData, onNext }) => {
             {...register('organizationMission', {
               required: 'Please describe your mission',
               maxLength: {
-                value: 200,
-                message: 'Please keep your mission statement under 200 characters'
+                value: 300,
+                message: 'Please keep your mission statement under 300 characters'
               }
             })}
             className="input-field"

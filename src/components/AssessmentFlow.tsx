@@ -9,15 +9,41 @@ import StepFour from "./QuestionFlow/StepFour";
 import EnhancedReviewStep from "./QuestionFlow/EnhancedReviewStep";
 import ProgressBar from "./ProgressBar";
 
+const STORAGE_KEY = 'trolley-assessment-data';
+const STEP_KEY = 'trolley-assessment-step';
+
+const loadSavedData = (): Partial<SessionData> => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    return saved ? JSON.parse(saved) : {};
+  } catch { return {}; }
+};
+
+const loadSavedStep = (): number => {
+  try {
+    const saved = localStorage.getItem(STEP_KEY);
+    return saved ? parseInt(saved, 10) : 0;
+  } catch { return 0; }
+};
+
 const AssessmentFlow: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [sessionData, setSessionData] = useState<Partial<SessionData>>({});
+  const [currentStep, setCurrentStep] = useState(loadSavedStep);
+  const [sessionData, setSessionData] = useState<Partial<SessionData>>(loadSavedData);
 
   const totalSteps = 5;
 
   const updateSessionData = (data: Partial<SessionData>) => {
-    setSessionData((prev) => ({ ...prev, ...data }));
+    setSessionData((prev) => {
+      const updated = { ...prev, ...data };
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(updated)); } catch {}
+      return updated;
+    });
   };
+
+  // Persist step changes
+  React.useEffect(() => {
+    try { localStorage.setItem(STEP_KEY, String(currentStep)); } catch {}
+  }, [currentStep]);
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
@@ -90,55 +116,71 @@ const AssessmentFlow: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background grain-overlay">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Header — visible during assessment steps */}
         {currentStep > 0 && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
             className="text-center mb-8"
           >
             <div className="flex justify-between items-center max-w-3xl mx-auto">
-              <div>
-                <h1 className="text-4xl font-bold text-primary mb-2">
+              <div className="text-left">
+                <h1 className="font-display text-title text-textDark">
                   The Nonprofit AI Trolley Problem
                 </h1>
-                <p className="text-lg text-gray-600">
-                  Navigate the ethical complexities of AI implementation
+                <p className="text-sm text-text-muted mt-1">
+                  Navigating the ethics of AI implementation
                 </p>
               </div>
               <a
                 href="/methodology"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:text-primary-dark font-medium flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-primary hover:bg-primary hover:text-white transition-colors"
+                className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary border border-primary/30 rounded-xl hover:bg-primary hover:text-white transition-all duration-200"
               >
-                📚 Methodology
+                Methodology
               </a>
             </div>
           </motion.div>
         )}
 
+        {/* Progress bar */}
         {currentStep > 0 && (
-          <ProgressBar
-            currentStep={currentStep}
-            totalSteps={totalSteps}
-            onStepClick={goToStep}
-          />
+          <div className="mb-10">
+            <ProgressBar
+              currentStep={currentStep}
+              totalSteps={totalSteps}
+              onStepClick={goToStep}
+            />
+          </div>
         )}
 
-        <div className="max-w-3xl mx-auto mt-8">
+        {/* Step content */}
+        <div className="max-w-3xl mx-auto">
           <AnimatePresence mode="wait">
             <motion.div
               key={currentStep}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             >
               {renderStep()}
             </motion.div>
           </AnimatePresence>
+        </div>
+
+        {/* Footer attribution */}
+        <div className="mt-16 text-center">
+          <p className="text-xs text-text-muted/60">
+            Powered by{' '}
+            <a href="https://mtm.now" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">
+              Meet the Moment
+            </a>
+          </p>
         </div>
       </div>
     </div>

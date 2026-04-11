@@ -55,8 +55,8 @@ const StepThree: React.FC<StepThreeProps> = ({ data, updateData, onNext, onPrev 
 
     return (
       <div className="flex items-center space-x-2">
-        <span className="text-xs text-gray-500 w-8">Low</span>
-        <div className="flex space-x-1">
+        <span className="text-xs text-text-muted w-10 text-right">Low</span>
+        <div className="flex space-x-1.5">
           {[1, 2, 3, 4, 5].map((rating) => (
             <label key={rating} className="cursor-pointer">
               <input
@@ -64,12 +64,13 @@ const StepThree: React.FC<StepThreeProps> = ({ data, updateData, onNext, onPrev 
                 value={rating}
                 {...register(name as any)}
                 className="sr-only"
+                aria-label={`${name} rating ${rating} of 5`}
               />
               <div
-                className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all ${
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 text-sm font-semibold ${
                   parseInt(String(value)) === rating
-                    ? 'bg-primary text-white'
-                    : 'bg-gray-200 hover:bg-gray-300 text-gray-600'
+                    ? 'bg-primary text-white shadow-md'
+                    : 'bg-background-alt hover:bg-rail-light text-text-muted border border-rail-light'
                 }`}
               >
                 {rating}
@@ -77,7 +78,7 @@ const StepThree: React.FC<StepThreeProps> = ({ data, updateData, onNext, onPrev 
             </label>
           ))}
         </div>
-        <span className="text-xs text-gray-500 w-8">High</span>
+        <span className="text-xs text-text-muted w-10">High</span>
       </div>
     );
   };

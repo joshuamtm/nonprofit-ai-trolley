@@ -1,15 +1,17 @@
 export interface SessionData {
   // Step 1: Context
   organizationType: string;
+  organizationSize: string; // small (<$2M), medium ($2M-$15M), large ($15M+)
   organizationMission: string;
-  otherChallenges?: string; // New: optional free text for other challenges
+  otherChallenges?: string;
 
   // Step 2: AI Initiative
   aiInitiativeTypes: string[];
   initiativeDescription: string;
   expectedOutcomes: string[];
-  implementationTimeline?: string; // New: immediate/6 months/1 year+
-  impactScale?: string; // New: pilot/department/organization-wide
+  implementationTimeline?: string;
+  impactScale?: string;
+  explorationStage?: string; // 'exploring' | 'evaluating' | 'ready'
 
   // Step 3: Concerns
   primaryConcerns: {
@@ -21,20 +23,19 @@ export interface SessionData {
     accuracyErrors: number;
     techDependency: number;
   };
-  topThreeConcerns?: string[]; // New: ranked top 3 concerns
-  otherConcerns?: string; // New: free text for other concerns
+  topThreeConcerns?: string[];
+  otherConcerns?: string;
   biggestFears: string[];
-  worstCaseScenario?: string; // New: specific scenario question
+  worstCaseScenario?: string;
 
   // Step 4: Context & Readiness
   currentCapacity: string;
-  problemUrgency: string;
-  stakeholderReadiness: string;
-  // New readiness assessment fields
-  technicalReadiness?: number; // 1-5 scale
-  changeManagementCapacity?: number; // 1-5 scale
-  ethicalFrameworkMaturity?: number; // 1-5 scale
-  dataGovernanceStatus?: number; // 1-5 scale
+  problemUrgency: string; // 'critical' | 'important' | 'exploratory'
+  stakeholderReadiness: string; // 'eager' | 'cautious' | 'skeptical' | 'resistant'
+  technicalReadiness: number; // 1-5 scale
+  changeManagementCapacity: number; // 1-5 scale
+  ethicalFrameworkMaturity: number; // 1-5 scale
+  dataGovernanceStatus: number; // 1-5 scale
 }
 
 export interface PathAnalysis {
