@@ -374,8 +374,27 @@ interface ReportProps {
 
 const TrolleyReport: React.FC<ReportProps> = ({ data, analysis }) => {
   const recommendedPath = analysis.recommendedPath || "";
-  const isRecommended = (pathTitle: string) =>
+  const isRecommendedPath = (pathTitle: string) =>
     recommendedPath.toLowerCase().includes(pathTitle.toLowerCase().slice(0, 8));
+
+  const isPullRecommended = isRecommendedPath("pull") && !recommendedPath.toLowerCase().includes("care") && !recommendedPath.toLowerCase().includes("safeguard");
+  const isDontPullRecommended = isRecommendedPath("don't") || isRecommendedPath("status");
+  const isSafeguardsRecommended = isRecommendedPath("care") || isRecommendedPath("safeguard");
+
+  // Build path entries and sort: recommended first, then by impact score descending
+  const allPaths = [
+    { path: analysis.pullLever, color: colors.signalGreen, label: "Implement AI", isRecommended: isPullRecommended },
+    { path: analysis.dontPull, color: colors.signalBlue, label: "Status Quo", isRecommended: isDontPullRecommended },
+    { path: analysis.withSafeguards, color: colors.signalAmber, label: "With Safeguards", isRecommended: isSafeguardsRecommended },
+  ];
+
+  const sortedPaths = [...allPaths].sort((a, b) => {
+    // Recommended path always first
+    if (a.isRecommended && !b.isRecommended) return -1;
+    if (!a.isRecommended && b.isRecommended) return 1;
+    // Then by impact score descending
+    return (b.path.impactScore || 0) - (a.path.impactScore || 0);
+  });
 
   return (
     <Document>
@@ -442,38 +461,18 @@ const TrolleyReport: React.FC<ReportProps> = ({ data, analysis }) => {
         <PageFooter pageNum={2} />
       </Page>
 
-      {/* Path 1: Implement */}
-      <Page size="LETTER" style={styles.page}>
-        <PathSection
-          path={analysis.pullLever}
-          pathColor={colors.signalGreen}
-          pathLabel="Implement AI"
-          isRecommended={isRecommended("pull") && !recommendedPath.toLowerCase().includes("care") && !recommendedPath.toLowerCase().includes("safeguard")}
-        />
-        <PageFooter pageNum={3} />
-      </Page>
-
-      {/* Path 2: Status Quo */}
-      <Page size="LETTER" style={styles.page}>
-        <PathSection
-          path={analysis.dontPull}
-          pathColor={colors.signalBlue}
-          pathLabel="Status Quo"
-          isRecommended={isRecommended("don't") || isRecommended("status")}
-        />
-        <PageFooter pageNum={4} />
-      </Page>
-
-      {/* Path 3: With Safeguards */}
-      <Page size="LETTER" style={styles.page}>
-        <PathSection
-          path={analysis.withSafeguards}
-          pathColor={colors.signalAmber}
-          pathLabel="With Safeguards"
-          isRecommended={isRecommended("care") || isRecommended("safeguard")}
-        />
-        <PageFooter pageNum={5} />
-      </Page>
+      {/* Paths sorted: recommended first, then by impact score descending */}
+      {sortedPaths.map((p, i) => (
+        <Page key={p.label} size="LETTER" style={styles.page}>
+          <PathSection
+            path={p.path}
+            pathColor={p.color}
+            pathLabel={p.label}
+            isRecommended={p.isRecommended}
+          />
+          <PageFooter pageNum={3 + i} />
+        </Page>
+      ))}
 
       {/* Discussion & Resources */}
       <Page size="LETTER" style={styles.page}>
