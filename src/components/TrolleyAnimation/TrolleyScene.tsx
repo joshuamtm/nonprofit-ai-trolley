@@ -8,7 +8,7 @@ interface TrolleySceneProps {
 
 const TrolleyScene: React.FC<TrolleySceneProps> = ({ onPathSelect, recommendedPath }) => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
-  const [animationComplete, setAnimationComplete] = useState(false);
+  const [, setAnimationComplete] = useState(false);
 
   // Auto-animate to recommended path on mount
   useEffect(() => {

@@ -21,7 +21,7 @@ const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({
   const [showComparison, setShowComparison] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(true);
-  const [analysisSource, setAnalysisSource] = useState<'ai' | 'template'>('template');
+  const [, setAnalysisSource] = useState<'ai' | 'template'>('template');
 
   useEffect(() => {
     const fetchAnalysis = async () => {
