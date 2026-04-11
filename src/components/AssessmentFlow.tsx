@@ -67,6 +67,15 @@ const AssessmentFlow: React.FC = () => {
     setCurrentStep(1);
   };
 
+  const startOver = () => {
+    setSessionData({});
+    setCurrentStep(0);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STEP_KEY);
+    } catch {}
+  };
+
   const renderStep = () => {
     switch (currentStep) {
       case 0:
@@ -135,14 +144,25 @@ const AssessmentFlow: React.FC = () => {
                   Navigating the ethics of AI implementation
                 </p>
               </div>
-              <a
-                href="/methodology"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary border border-primary/30 rounded-xl hover:bg-primary hover:text-white transition-all duration-200"
-              >
-                Methodology
-              </a>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={startOver}
+                  className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-text-muted hover:text-secondary border border-rail-light rounded-xl hover:border-secondary/30 transition-all duration-200"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Start Over
+                </button>
+                <a
+                  href="/methodology"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-primary border border-primary/30 rounded-xl hover:bg-primary hover:text-white transition-all duration-200"
+                >
+                  Methodology
+                </a>
+              </div>
             </div>
           </motion.div>
         )}
