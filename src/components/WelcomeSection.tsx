@@ -108,6 +108,48 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onGetStarted }) => {
         </div>
       </motion.div>
 
+      {/* Cat Trolley Video — Answer in Progress */}
+      <motion.div variants={fadeUp} className="card mb-6">
+        <h3 className="font-display text-lg text-textDark mb-2">
+          The Trolley Problem, Explained (with Cats)
+        </h3>
+        <p className="text-sm text-text-muted mb-4">
+          This delightful ~2-minute video explains both the trolley problem <em>and</em> the
+          AI alignment challenge at the heart of this tool.
+        </p>
+        <div className="aspect-video w-full rounded-lg overflow-hidden bg-background-alt">
+          <iframe
+            className="w-full h-full"
+            src="https://www.youtube.com/embed/x9SyL_B_xbY"
+            title="Cat Trolley Problem — Answer in Progress"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+        <p className="mt-3 text-xs text-text-muted">
+          Video by the wonderful{' '}
+          <a
+            href="https://www.youtube.com/@answerinprogress"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline font-semibold"
+          >
+            Answer in Progress
+          </a>
+          . Watch the{' '}
+          <a
+            href="https://www.youtube.com/watch?v=181Nj060xMQ&t"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline font-semibold"
+          >
+            full video here
+          </a>
+          .
+        </p>
+      </motion.div>
+
       {/* Why the Trolley Problem — collapsible */}
       <motion.div variants={fadeUp} className="card mb-8">
         <button
