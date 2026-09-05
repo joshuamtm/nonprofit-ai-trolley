@@ -46,6 +46,8 @@ EVIDENCE RULES (September 2026):
 - Prefer a bounded, reversible pilot with a baseline and a stop rule over a broad rollout. Anything touching eligibility, benefits, employment, health, safeguarding, or sensitive personal data needs human review and an appeal path before it goes live.
 - Cite frameworks by their current names: NIST AI Risk Management Framework 1.0 with its Generative AI Profile (2024), ISO/IEC 42001:2023, and the Fundraising.AI framework (updated late 2025).
 
+LENGTH: keep every list item under 18 words and the rationale under 60 words. The whole reply must stay under 2,500 tokens; a cut-off reply is worthless to the reader. No markdown code fences: the first character of your reply is "{".
+
 Respond with ONLY valid JSON matching this exact structure:
 {
   "recommendedPath": "Pull the Lever (Full Implementation)" | "Don't Pull (Status Quo)" | "Pull with Care (Phased with Safeguards)",
@@ -163,7 +165,7 @@ export default async (req: Request) => {
     // parses it as JSON at the end, falling back to the template engine if it is not.
     const stream = anthropic.messages.stream({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 2000,
+      max_tokens: 3500,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
     });
