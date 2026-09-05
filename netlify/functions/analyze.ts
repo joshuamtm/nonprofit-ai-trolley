@@ -46,9 +46,9 @@ EVIDENCE RULES (September 2026):
 - Prefer a bounded, reversible pilot with a baseline and a stop rule over a broad rollout. Anything touching eligibility, benefits, employment, health, safeguarding, or sensitive personal data needs human review and an appeal path before it goes live.
 - Cite frameworks by their current names: NIST AI Risk Management Framework 1.0 with its Generative AI Profile (2024), ISO/IEC 42001:2023, and the Fundraising.AI framework (updated late 2025).
 
-LENGTH: keep every list item under 18 words and the rationale under 60 words. The whole reply must stay under 2,500 tokens; a cut-off reply is worthless to the reader. No markdown code fences: the first character of your reply is "{".
+LENGTH: keep every list item under 15 words and the rationale under 60 words. Three items per list is enough; never more than four. A long reply is cut off and worthless to the reader.
 
-Respond with ONLY valid JSON matching this exact structure:
+Submit your analysis by calling the submit_analysis tool. Its input has this shape (the bracketed text describes each field):
 {
   "recommendedPath": "Pull the Lever (Full Implementation)" | "Don't Pull (Status Quo)" | "Pull with Care (Phased with Safeguards)",
   "rationale": "2-3 sentence explanation of why this path fits their specific situation",
@@ -112,6 +112,76 @@ Respond with ONLY valid JSON matching this exact structure:
   }
 }`;
 
+// The analysis comes back as a forced tool call, so the JSON is well-formed by
+// construction: no markdown fences, no unterminated strings (both seen live from a
+// plain-text reply on 2026-09-05). The schema also caps list sizes, which is what
+// keeps the reply inside the function's time budget.
+const shortList = (description: string, maxItems: number) => ({
+  type: "array",
+  description,
+  minItems: 3,
+  maxItems,
+  items: { type: "string", description: "One item, under 15 words" },
+});
+
+const pathSchema = (extraProps: Record<string, unknown> = {}, extraRequired: string[] = []) => ({
+  type: "object",
+  properties: {
+    title: { type: "string" },
+    benefits: shortList("Specific benefits for this organization", 4),
+    risks: shortList("Specific risks, tied to their concerns", 4),
+    recommendations: shortList("Actionable recommendations", 4),
+    actionPlan30Days: shortList("First-month actions", 3),
+    actionPlan60Days: shortList("Second-month actions", 3),
+    actionPlan90Days: shortList("Third-month actions", 3),
+    budgetEstimates: {
+      type: "object",
+      properties: {
+        initial: { type: "string", description: "Planning band, e.g. $8,000-$20,000, or $0 for AI" },
+        ongoing: { type: "string", description: "Planning band per year, or a description of current costs" },
+        total: { type: "string", description: "Planning band over three years, or a description" },
+      },
+      required: ["initial", "ongoing", "total"],
+    },
+    impactScore: { type: "integer", minimum: 0, maximum: 100 },
+    tradeOffSummary: {
+      type: "object",
+      properties: {
+        gains: shortList("What they gain on this road", 4),
+        losses: shortList("What they give up on this road", 4),
+      },
+      required: ["gains", "losses"],
+    },
+    ...extraProps,
+  },
+  required: [
+    "title", "benefits", "risks", "recommendations", "actionPlan30Days", "actionPlan60Days",
+    "actionPlan90Days", "budgetEstimates", "impactScore", "tradeOffSummary", ...extraRequired,
+  ],
+});
+
+const ANALYSIS_TOOL = {
+  name: "submit_analysis",
+  description: "Submit the three-road analysis for this organization.",
+  input_schema: {
+    type: "object" as const,
+    properties: {
+      recommendedPath: {
+        type: "string",
+        enum: ["Pull the Lever (Full Implementation)", "Don't Pull (Status Quo)", "Pull with Care (Phased with Safeguards)"],
+      },
+      rationale: { type: "string", description: "Two or three sentences, under 60 words, specific to their answers" },
+      pullLever: pathSchema(),
+      dontPull: pathSchema(),
+      withSafeguards: pathSchema(
+        { mitigationStrategies: shortList("Risk mitigation strategies tied to their top concerns", 3) },
+        ["mitigationStrategies"],
+      ),
+    },
+    required: ["recommendedPath", "rationale", "pullLever", "dontPull", "withSafeguards"],
+  },
+};
+
 export default async (req: Request) => {
   // Only accept POST
   if (req.method !== "POST") {
@@ -165,8 +235,10 @@ export default async (req: Request) => {
     // parses it as JSON at the end, falling back to the template engine if it is not.
     const stream = anthropic.messages.stream({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 3500,
+      max_tokens: 3000,
       system: SYSTEM_PROMPT,
+      tools: [ANALYSIS_TOOL],
+      tool_choice: { type: "tool", name: "submit_analysis" },
       messages: [{ role: "user", content: userMessage }],
     });
 
@@ -175,8 +247,8 @@ export default async (req: Request) => {
       async start(controller) {
         try {
           for await (const event of stream) {
-            if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
-              controller.enqueue(encoder.encode(event.delta.text));
+            if (event.type === "content_block_delta" && event.delta.type === "input_json_delta") {
+              controller.enqueue(encoder.encode(event.delta.partial_json));
             }
           }
           controller.close();
