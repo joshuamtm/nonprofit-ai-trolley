@@ -34,7 +34,9 @@ const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({ data, onPrev })
           body: JSON.stringify(data),
         });
         if (response.ok) {
-          const aiAnalysis = await response.json();
+          // The function streams the advisor's text; read it all, then parse.
+          const raw = (await response.text()).trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+          const aiAnalysis = JSON.parse(raw);
           if (!aiAnalysis.fallback && aiAnalysis.recommendedPath) {
             setAnalysis(aiAnalysis);
             setAnalysisSource('ai');
@@ -108,7 +110,7 @@ const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({ data, onPrev })
       <div className="mt-6" aria-live="polite">
         <p className="rubric hidden sm:block">Section 5 of 5 · the analysis</p>
         <h2 className="font-display font-semibold text-heading uppercase mt-1">Setting the road</h2>
-        <p className="font-serif text-[17px] mt-2 max-w-[58ch]">Reading your answers and writing the register entry. About ten seconds. If the advisor is unavailable, the template engine takes over.</p>
+        <p className="font-serif text-[17px] mt-2 max-w-[58ch]">Reading your answers and writing the register entry. Usually twenty to forty seconds. If the advisor is unavailable, the template engine takes over.</p>
         <div className="mt-6 border-2 border-ink bg-paper-light h-3 overflow-hidden" aria-hidden="true">
           <div className="h-full w-1/3 bg-ink animate-pulse" />
         </div>

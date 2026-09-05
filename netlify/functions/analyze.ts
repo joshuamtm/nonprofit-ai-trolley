@@ -52,12 +52,12 @@ Respond with ONLY valid JSON matching this exact structure:
   "rationale": "2-3 sentence explanation of why this path fits their specific situation",
   "pullLever": {
     "title": "Path 1: Implement AI",
-    "benefits": ["4-5 specific benefits based on their use case and org"],
-    "risks": ["4-5 specific risks based on their concerns"],
-    "recommendations": ["4-5 actionable recommendations"],
-    "actionPlan30Days": ["3-4 specific first-month actions"],
-    "actionPlan60Days": ["3-4 specific second-month actions"],
-    "actionPlan90Days": ["3-4 specific third-month actions"],
+    "benefits": ["3-4 specific benefits based on their use case and org"],
+    "risks": ["3-4 specific risks based on their concerns"],
+    "recommendations": ["3-4 actionable recommendations"],
+    "actionPlan30Days": ["3 specific first-month actions"],
+    "actionPlan60Days": ["3 specific second-month actions"],
+    "actionPlan90Days": ["3 specific third-month actions"],
     "budgetEstimates": {
       "initial": "$X-$Y",
       "ongoing": "$X-$Y/year",
@@ -71,12 +71,12 @@ Respond with ONLY valid JSON matching this exact structure:
   },
   "dontPull": {
     "title": "Path 2: Maintain Current Approach",
-    "benefits": ["4-5 genuine benefits of not adopting AI"],
-    "risks": ["4-5 risks of inaction specific to their situation"],
-    "recommendations": ["4-5 alternative improvements without AI"],
-    "actionPlan30Days": ["3-4 non-AI improvement actions"],
-    "actionPlan60Days": ["3-4 actions"],
-    "actionPlan90Days": ["3-4 actions"],
+    "benefits": ["3-4 genuine benefits of not adopting AI"],
+    "risks": ["3-4 risks of inaction specific to their situation"],
+    "recommendations": ["3-4 alternative improvements without AI"],
+    "actionPlan30Days": ["3 non-AI improvement actions"],
+    "actionPlan60Days": ["3 actions"],
+    "actionPlan90Days": ["3 actions"],
     "budgetEstimates": {
       "initial": "$0 for AI",
       "ongoing": "description of current costs",
@@ -90,13 +90,13 @@ Respond with ONLY valid JSON matching this exact structure:
   },
   "withSafeguards": {
     "title": "Path 3: Implement with Safeguards",
-    "benefits": ["4-5 specific benefits of phased approach"],
-    "risks": ["4-5 risks even with safeguards"],
-    "recommendations": ["4-5 specific safeguard recommendations"],
-    "mitigationStrategies": ["3-4 risk mitigation strategies tied to their top concerns"],
-    "actionPlan30Days": ["3-4 phase-1 actions"],
-    "actionPlan60Days": ["3-4 phase-2 actions"],
-    "actionPlan90Days": ["3-4 phase-3 actions"],
+    "benefits": ["3-4 specific benefits of phased approach"],
+    "risks": ["3-4 risks even with safeguards"],
+    "recommendations": ["3-4 specific safeguard recommendations"],
+    "mitigationStrategies": ["3 risk mitigation strategies tied to their top concerns"],
+    "actionPlan30Days": ["3 phase-1 actions"],
+    "actionPlan60Days": ["3 phase-2 actions"],
+    "actionPlan90Days": ["3 phase-3 actions"],
     "budgetEstimates": {
       "initial": "$X-$Y",
       "ongoing": "$X-$Y/year",
@@ -156,27 +156,41 @@ export default async (req: Request) => {
     // Build the user message from session data
     const userMessage = buildUserMessage(sessionData);
 
-    const response = await anthropic.messages.create({
+    // Stream the model's text straight through. A buffered reply sat silent for the
+    // whole generation (30 seconds and more), and Netlify's edge closes any response
+    // that sends nothing for 30 seconds with a 504 "Inactivity Timeout" (seen live
+    // 2026-09-05). Streaming keeps bytes moving; the browser reads the whole body and
+    // parses it as JSON at the end, falling back to the template engine if it is not.
+    const stream = anthropic.messages.stream({
       model: "claude-haiku-4-5-20251001",
-      max_tokens: 2500,
+      max_tokens: 2000,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: userMessage }],
     });
 
-    // Extract text content
-    const textBlock = response.content.find((b) => b.type === "text");
-    if (!textBlock || textBlock.type !== "text") {
-      throw new Error("No text response from API");
-    }
+    const encoder = new TextEncoder();
+    const out = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        try {
+          for await (const event of stream) {
+            if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+              controller.enqueue(encoder.encode(event.delta.text));
+            }
+          }
+          controller.close();
+        } catch (err) {
+          console.error("Analysis stream error:", err);
+          controller.error(err);
+        }
+      },
+    });
 
-    // Parse and validate JSON
-    const analysis = JSON.parse(textBlock.text);
-
-    return new Response(JSON.stringify(analysis), {
+    return new Response(out, {
       status: 200,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json; charset=utf-8",
         "Cache-Control": "no-store",
+        "X-Accel-Buffering": "no",
       },
     });
   } catch (error: any) {
