@@ -16,7 +16,7 @@ The point of the tool is the one the trolley problem makes: **not pulling the le
 
 ## Design: "Section Occupied"
 
-The site is drawn as a signal-box track-circuit diagram redrawn as a printed working document. Grey panel paper, condensed capitals for rubrics, Spectral for the questions, mono for the register entries. The five sections light on the track strip as you pass through them. Concerns are rated on lamp rows. The analysis is a facing point: the recommended road lights sage and the trolley takes it; the "don't pull" road is lit red and labelled with what is already on it. A carbon-duplicate strip at the foot carries the answers into the PDF.
+The site is drawn as a signal-box track-circuit diagram redrawn as a printed working document. Grey panel paper, condensed capitals for rubrics, Spectral for the questions, mono for the register entries. The five sections light on the track strip as you pass through them. Concerns are rated on lamp rows. The analysis is a facing point: the recommended road lights sage and the trolley takes it; the "don't pull" road is lit red and labelled with what is already on it. A running strip of the visitor's answers at the foot carries them into the PDF.
 
 The look came out of the Wild Mode design process (September 2026): a four-question brief, five externally seeded design concepts, one chosen, and two rounds with a screenshot-only design critic. Details of that process live in the MTM design-modes module, not in this repo.
 
@@ -52,7 +52,7 @@ The AI advisor needs `ANTHROPIC_API_KEY` in the Netlify site environment. Locall
 ```
 src/
   components/
-    AssessmentFlow.tsx        Nameplate, track strip, section routing, carbon strip
+    AssessmentFlow.tsx        Nameplate, track strip, section routing, answers strip
     WelcomeSection.tsx        Hero, evidence, briefing film, what you leave with
     SectionStrip.tsx          The five track sections
     LampScale.tsx             1 to 5 lamp rating row

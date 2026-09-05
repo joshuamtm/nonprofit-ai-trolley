@@ -95,7 +95,7 @@ const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({ data, onPrev })
         />
         <div className="rule-top mt-8 pt-5">
           <button onClick={handleGeneratePDF} disabled={isGenerating} className="btn-panel w-full sm:w-auto sm:min-w-[24rem] py-4 text-[16px]">
-            {isGenerating ? "Preparing the PDF" : "Take the carbon to your board, PDF"}
+            {isGenerating ? "Preparing the PDF" : "Download the board report, PDF"}
           </button>
           <div className="mt-5 font-display text-[13px] uppercase tracking-[0.08em]">
             <button onClick={() => setShowComparison(false)} className="underline underline-offset-4 decoration-1 text-ink hover:text-signal">Back to the diagram</button>
@@ -227,7 +227,7 @@ const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({ data, onPrev })
       {/* Actions: the primary on its own row, the rest as quiet links */}
       <div className="rule-top mt-8 pt-5">
         <button onClick={handleGeneratePDF} disabled={isGenerating} className="btn-panel w-full sm:w-auto sm:min-w-[24rem] py-4 text-[16px]">
-          {isGenerating ? "Preparing the PDF" : "Take the carbon to your board, PDF"}
+          {isGenerating ? "Preparing the PDF" : "Download the board report, PDF"}
         </button>
         <p className="mt-2 font-mono text-[12px] text-ink-soft">Generated in your browser. Nothing is uploaded.</p>
         <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 font-display text-[13px] uppercase tracking-[0.08em]">

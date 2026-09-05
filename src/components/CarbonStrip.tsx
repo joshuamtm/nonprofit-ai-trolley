@@ -48,9 +48,9 @@ const CarbonStrip: React.FC<{ data: Partial<SessionData> }> = ({ data }) => {
   const entries = carbonEntries(data);
   if (!entries.length) return null;
   return (
-    <aside aria-label="Carbon copy of your answers so far" className="mt-10 bg-paper-deep border-t-2 border-ink px-4 py-3">
+    <aside aria-label="Your answers so far" className="mt-10 bg-paper-deep border-t-2 border-ink px-4 py-3">
       <div className="max-w-panel mx-auto">
-        <p className="rubric mb-1.5">Carbon duplicate, board copy · {entries.length} {entries.length === 1 ? "entry" : "entries"} so far</p>
+        <p className="rubric mb-1.5">Your answers so far · {entries.length} {entries.length === 1 ? "entry" : "entries"} · these go into your board report</p>
         <ol className="font-mono text-[12.5px] leading-relaxed text-ink space-y-0.5">
           {entries.map((line, i) => (
             <li key={i} className="flex gap-2">
