@@ -8,6 +8,7 @@ import {
   pdf,
 } from "@react-pdf/renderer";
 import { SessionData, PathAnalysis } from "../types";
+import { roadName, unprefixPlanItem } from "./roadNames";
 
 // Use Helvetica (built into react-pdf) — no external font fetching needed
 
@@ -247,7 +248,7 @@ const PathSection = ({
     >
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
         <Text style={{ fontSize: 16, fontWeight: 700, color: pathColor }}>
-          {path.title}
+          {roadName(path.title)}
         </Text>
         {path.impactScore && (
           <Text style={{ fontSize: 10, fontWeight: 600, color: colors.textMuted }}>
@@ -303,7 +304,7 @@ const PathSection = ({
                 <Text style={styles.roadmapLabel}>{period.label}</Text>
                 {period.items?.slice(0, 3).map((item, i) => (
                   <Text key={i} style={{ fontSize: 8, lineHeight: 1.5, color: colors.textDark, marginBottom: 2 }}>
-                    • {item}
+                    • {unprefixPlanItem(item)}
                   </Text>
                 ))}
               </View>
@@ -425,7 +426,7 @@ const TrolleyReport: React.FC<ReportProps> = ({ data, analysis }) => {
         {analysis.recommendedPath && (
           <View style={styles.recommendBanner}>
             <Text style={{ fontSize: 12, fontWeight: 700, color: colors.primary, marginBottom: 4 }}>
-              Recommended Path: {analysis.recommendedPath}
+              Recommended road: {roadName(analysis.recommendedPath)}
             </Text>
             <Text style={{ fontSize: 10, lineHeight: 1.5, color: colors.textDark }}>
               {analysis.rationale || "Based on your organization's specific situation, concerns, and readiness levels."}
@@ -434,9 +435,12 @@ const TrolleyReport: React.FC<ReportProps> = ({ data, analysis }) => {
         )}
 
         <Text style={styles.bodyText}>
-          This report presents a comprehensive analysis of three potential paths for AI adoption
-          at your organization. Each path is evaluated with specific benefits, risks, action plans,
-          and budget estimates tailored to your situation.
+          This report sets out three paths for the AI initiative your organization is weighing,
+          each with benefits, risks, an action plan, and planning-band budget figures. Holding
+          the status quo is treated as a decision with its own costs, not as the safe default:
+          in most organizations staff are already using AI informally, and demand is rising
+          faster than capacity. Budget figures are planning bands, not quotes; no independent
+          nonprofit cost benchmark existed when this report was generated.
         </Text>
 
         <Text style={styles.subsectionHeader}>Your Organization</Text>
@@ -498,11 +502,12 @@ const TrolleyReport: React.FC<ReportProps> = ({ data, analysis }) => {
         <Text style={[styles.sectionHeader, { marginTop: 20 }]}>Resources</Text>
         <BulletList
           items={[
-            "Partnership on AI — Responsible AI Resources (partnershiponai.org)",
-            "AI Now Institute — Nonprofit AI Guidelines",
-            "TechSoup — AI Readiness Resources (techsoup.org)",
-            "NIST AI Risk Management Framework (nist.gov/artificial-intelligence)",
-            "Meet the Moment — AI Advisory Services (mtm.now)",
+            "NIST AI Risk Management Framework 1.0 (2023) and its Generative AI Profile, NIST AI 600-1 (July 2024): nist.gov/itl/ai-risk-management-framework",
+            "ISO/IEC 42001:2023, the certifiable AI management system standard: iso.org/standard/42001",
+            "Fundraising.AI Framework for Responsible and Beneficial AI, updated late 2025: fundraising.ai/framework",
+            "NTEN, Artificial Intelligence Framework for an Equitable World (2024) and the free AI for Nonprofits cohort: nten.org",
+            "Center for Effective Philanthropy, AI With Purpose (2025) and State of Nonprofits 2026: cep.org",
+            "Meet the Moment, nonprofit AI advisory: mtm.now",
           ]}
         />
 

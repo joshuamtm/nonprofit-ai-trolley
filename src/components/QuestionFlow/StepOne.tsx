@@ -1,6 +1,5 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
 import { SessionData } from '../../types';
 
 interface StepOneProps {
@@ -28,87 +27,56 @@ const StepOne: React.FC<StepOneProps> = ({ data, updateData, onNext }) => {
   };
 
   return (
-    <div className="card">
-      <h2 className="mb-6">Step 1: Initiative Context</h2>
-      <p className="text-gray-600 mb-6">
-        Let's start by understanding your organization and its mission.
-      </p>
+    <div className="mt-6">
+      <p className="rubric hidden sm:block">Section 1 of 5 · your organisation</p>
+      <h2 className="font-display font-semibold text-heading uppercase mt-1">Who is on the line</h2>
+      <p className="font-serif text-[17px] mt-2 max-w-[58ch]">Three questions so the analysis is about your organisation and not a generic one.</p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-7">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            What type of organization are you?
-          </label>
-          <select
-            {...register('organizationType', { required: 'Please select an organization type' })}
-            className="input-field"
-          >
-            <option value="">Select an option...</option>
-            <option value="environmental">Environmental/Conservation</option>
-            <option value="health">Health/Human Services</option>
-            <option value="education">Education/Youth Development</option>
-            <option value="crisis">Crisis Support/Emergency Response</option>
-            <option value="community">Community Development</option>
-            <option value="arts">Arts/Culture</option>
-            <option value="advocacy">Advocacy/Policy</option>
-            <option value="faith">Faith-Based</option>
-            <option value="foundation">Foundation/Grantmaker</option>
+          <label htmlFor="organizationType" className="block font-serif text-[18px]">What kind of organisation are you?</label>
+          <select id="organizationType" {...register('organizationType', { required: 'Choose the closest type' })} className="input-field mt-2 max-w-md">
+            <option value="">Choose one</option>
+            <option value="environmental">Environmental / conservation</option>
+            <option value="health">Health / human services</option>
+            <option value="education">Education / youth development</option>
+            <option value="crisis">Crisis support / emergency response</option>
+            <option value="community">Community development</option>
+            <option value="arts">Arts / culture</option>
+            <option value="advocacy">Advocacy / policy</option>
+            <option value="faith">Faith-based</option>
+            <option value="foundation">Foundation / grantmaker</option>
             <option value="other">Other</option>
           </select>
-          {errors.organizationType && (
-            <p className="mt-1 text-sm text-red-600">{errors.organizationType.message}</p>
-          )}
+          {errors.organizationType && <p className="mt-1 text-[14px] text-signal">{errors.organizationType.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            What is your organization's approximate annual budget?
-          </label>
-          <select
-            {...register('organizationSize', { required: 'Please select a budget range' })}
-            className="input-field"
-          >
-            <option value="">Select a range...</option>
+          <label htmlFor="organizationSize" className="block font-serif text-[18px]">Roughly, what is your annual budget?</label>
+          <select id="organizationSize" {...register('organizationSize', { required: 'Choose a range' })} className="input-field mt-2 max-w-md">
+            <option value="">Choose a range</option>
             <option value="small">Under $2 million</option>
-            <option value="medium">$2 million – $15 million</option>
-            <option value="large">$15 million – $50 million</option>
+            <option value="medium">$2 million to $15 million</option>
+            <option value="large">$15 million to $50 million</option>
             <option value="enterprise">Over $50 million</option>
           </select>
-          {errors.organizationSize && (
-            <p className="mt-1 text-sm text-red-600">{errors.organizationSize.message}</p>
-          )}
+          {errors.organizationSize && <p className="mt-1 text-[14px] text-signal">{errors.organizationSize.message}</p>}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            In one sentence, what's your organization's core mission?
-          </label>
-          <textarea
+          <label htmlFor="organizationMission" className="block font-serif text-[18px]">In one sentence, what is your mission?</label>
+          <textarea id="organizationMission"
             {...register('organizationMission', {
-              required: 'Please describe your mission',
-              maxLength: {
-                value: 300,
-                message: 'Please keep your mission statement under 300 characters'
-              }
+              required: 'One sentence is enough',
+              maxLength: { value: 300, message: 'Keep it under 300 characters' }
             })}
-            className="input-field"
-            rows={3}
-            placeholder="e.g., We provide emergency food assistance to families experiencing food insecurity..."
-          />
-          {errors.organizationMission && (
-            <p className="mt-1 text-sm text-red-600">{errors.organizationMission.message}</p>
-          )}
+            className="input-field mt-2" rows={3}
+            placeholder="We provide emergency food assistance to families experiencing food insecurity in the Bronx." />
+          {errors.organizationMission && <p className="mt-1 text-[14px] text-signal">{errors.organizationMission.message}</p>}
         </div>
 
-        <div className="flex justify-end">
-          <motion.button
-            type="submit"
-            className="btn-primary"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Next Step →
-          </motion.button>
+        <div className="hairline pt-5 flex justify-end">
+          <button type="submit" className="btn-panel">Next, section 2</button>
         </div>
       </form>
     </div>

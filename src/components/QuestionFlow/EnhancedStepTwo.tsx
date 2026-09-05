@@ -1,18 +1,6 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { motion } from "framer-motion";
-import {
-  ChevronDown,
-  ChevronUp,
-  Cpu,
-  MessageSquare,
-  FileText,
-  Zap,
-  Brain,
-  Settings,
-} from "lucide-react";
 import { SessionData } from "../../types";
-import Tooltip from "../Tooltip";
 import WhyThisMatters from "../WhyThisMatters";
 
 interface EnhancedStepTwoProps {
@@ -22,19 +10,10 @@ interface EnhancedStepTwoProps {
   onPrev: () => void;
 }
 
-const EnhancedStepTwo: React.FC<EnhancedStepTwoProps> = ({
-  data,
-  updateData,
-  onNext,
-  onPrev,
-}) => {
+const EnhancedStepTwo: React.FC<EnhancedStepTwoProps> = ({ data, updateData, onNext, onPrev }) => {
   const [expandedTypes, setExpandedTypes] = useState<string[]>([]);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const { register, handleSubmit, watch, formState: { errors } } = useForm({
     defaultValues: {
       aiInitiativeTypes: data.aiInitiativeTypes || [],
       initiativeDescription: data.initiativeDescription || "",
@@ -46,122 +25,30 @@ const EnhancedStepTwo: React.FC<EnhancedStepTwoProps> = ({
   });
 
   const toggleExpanded = (type: string) => {
-    setExpandedTypes((prev) =>
-      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
-    );
+    setExpandedTypes((prev) => prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]);
   };
 
   const aiTypes = [
-    {
-      value: "data_analysis",
-      label: "Data Analysis & Insights",
-      icon: <Cpu className="w-5 h-5" />,
-      description:
-        "AI that analyzes your existing data to find patterns, predict trends, and generate insights",
-      examples: [
-        "Donor behavior analysis to predict major gift likelihood",
-        "Program outcome analysis to identify success factors",
-        "Resource allocation optimization based on impact data",
-      ],
-    },
-    {
-      value: "chatbot",
-      label: "Chatbot/Automated Response",
-      icon: <MessageSquare className="w-5 h-5" />,
-      description:
-        "AI-powered conversational interfaces for stakeholder interaction",
-      examples: [
-        "24/7 helpline for beneficiaries seeking resources",
-        "Automated FAQ responses for volunteer inquiries",
-        "Initial intake screening for service eligibility",
-      ],
-    },
-    {
-      value: "content_generation",
-      label: "Content Generation",
-      icon: <FileText className="w-5 h-5" />,
-      description:
-        "AI that creates written content, reports, or communications",
-      examples: [
-        "Grant proposal drafting assistance",
-        "Personalized donor thank-you letters",
-        "Social media content creation",
-      ],
-    },
-    {
-      value: "automation",
-      label: "Process Automation",
-      icon: <Zap className="w-5 h-5" />,
-      description: "AI that automates repetitive tasks and workflows",
-      examples: [
-        "Automated data entry from forms and documents",
-        "Email categorization and routing",
-        "Expense report processing and approval",
-      ],
-    },
-    {
-      value: "decision_support",
-      label: "Decision Support System",
-      icon: <Brain className="w-5 h-5" />,
-      description:
-        "AI that helps staff make better decisions with data-driven recommendations",
-      examples: [
-        "Client risk assessment and intervention recommendations",
-        "Grant application scoring and prioritization",
-        "Program participant matching for best outcomes",
-      ],
-    },
-    {
-      value: "other",
-      label: "Other",
-      icon: <Settings className="w-5 h-5" />,
-      description: "Other AI applications not listed above",
-      examples: [],
-    },
+    { value: "data_analysis", label: "Data analysis and insight", description: "AI that reads the data you already have to find patterns and predict trends", examples: ["Donor behaviour analysis to predict major-gift likelihood", "Programme outcome analysis to find what drives success", "Resource allocation based on impact data"] },
+    { value: "chatbot", label: "Chatbot or automated answers", description: "A conversational assistant for the people you serve or your volunteers", examples: ["After-hours help line for people seeking resources", "Automated answers to volunteer questions", "First-pass screening for service eligibility"] },
+    { value: "content_generation", label: "Drafting and content", description: "AI that drafts reports, letters, and communications for a person to finish", examples: ["Grant proposal first drafts", "Personalised donor thank-you letters", "Social media posts"] },
+    { value: "automation", label: "Process automation", description: "AI that takes over repetitive tasks and hand-offs", examples: ["Data entry from forms and documents", "Email sorting and routing", "Expense report processing"] },
+    { value: "decision_support", label: "Decision support", description: "AI that recommends, and a person decides", examples: ["Client risk assessment and intervention suggestions", "Grant application scoring", "Matching participants to programmes"] },
+    { value: "other", label: "Something else", description: "An AI use not listed here", examples: [] },
   ];
 
   const outcomeOptions = [
-    {
-      value: "serve_more",
-      label: "Serve more beneficiaries",
-      impact: "Capacity & Scale",
-    },
-    {
-      value: "reduce_time",
-      label: "Reduce response time",
-      impact: "Efficiency",
-    },
-    {
-      value: "improve_quality",
-      label: "Improve decision quality",
-      impact: "Effectiveness",
-    },
-    {
-      value: "free_staff",
-      label: "Free up staff time",
-      impact: "Human Resources",
-    },
-    {
-      value: "reduce_costs",
-      label: "Reduce operational costs",
-      impact: "Financial",
-    },
-    {
-      value: "increase_revenue",
-      label: "Increase revenue/fundraising",
-      impact: "Financial",
-    },
-    {
-      value: "increase_access",
-      label: "Increase accessibility",
-      impact: "Equity",
-    },
-    {
-      value: "generate_insights",
-      label: "Generate new insights",
-      impact: "Innovation",
-    },
+    { value: "serve_more", label: "Serve more people", impact: "capacity" },
+    { value: "reduce_time", label: "Respond faster", impact: "efficiency" },
+    { value: "improve_quality", label: "Make better decisions", impact: "effectiveness" },
+    { value: "free_staff", label: "Free up staff time", impact: "people" },
+    { value: "reduce_costs", label: "Cut operating costs", impact: "money" },
+    { value: "increase_revenue", label: "Raise more money", impact: "money" },
+    { value: "increase_access", label: "Widen access", impact: "equity" },
+    { value: "generate_insights", label: "Learn something new from our data", impact: "insight" },
   ];
+
+  const description = watch("initiativeDescription");
 
   const onSubmit = (formData: any) => {
     updateData({
@@ -176,286 +63,127 @@ const EnhancedStepTwo: React.FC<EnhancedStepTwoProps> = ({
   };
 
   return (
-    <div className="card">
-      <h2 className="mb-6">Step 2: AI Initiative Details</h2>
-      <p className="text-gray-600 mb-6">
-        Let's explore the AI initiative you're considering and its potential
-        impact.
-      </p>
+    <div className="mt-6">
+      <p className="rubric hidden sm:block">Section 2 of 5 · the AI initiative</p>
+      <h2 className="font-display font-semibold text-heading uppercase mt-1">What you are weighing</h2>
+      <p className="font-serif text-[17px] mt-2 max-w-[58ch]">The initiative itself, what success would look like, and how far along you are.</p>
 
       <WhyThisMatters
-        content="Your AI type selection helps us understand the technical complexity and resource requirements. Your expected outcomes shape our recommendations for success metrics and implementation approach."
-        influences={[
-          "Recommended implementation timeline",
-          "Required technical resources",
-          "Risk mitigation strategies",
-          "Budget estimates",
-        ]}
+        content="The type of AI and the outcomes you name shape the risks the analysis flags, the safeguards it recommends, and the size of the planning-band budget."
+        influences={["timeline", "resources", "safeguards", "budget band"]}
       />
 
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-6">
-        {/* Exploration Stage */}
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-7">
+        {/* Stage */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Where are you in your AI journey?
-          </label>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <p className="font-serif text-[18px]">Where are you in this?</p>
+          <div className="mt-2 max-w-xl">
             {[
-              { value: 'exploring', label: 'Exploring', description: "I'm curious about AI but don't have a specific initiative in mind" },
-              { value: 'evaluating', label: 'Evaluating', description: "I'm considering a specific AI initiative and want to assess it" },
-              { value: 'ready', label: 'Ready to Act', description: "I've done my research and want a decision framework" },
+              { value: 'exploring', label: 'Exploring', description: 'Curious about AI, no specific initiative yet' },
+              { value: 'evaluating', label: 'Evaluating', description: 'Weighing a specific initiative' },
+              { value: 'ready', label: 'Ready to act', description: 'Research done; I want a decision framework' },
             ].map((stage) => (
-              <label
-                key={stage.value}
-                className="flex items-start p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  value={stage.value}
-                  {...register('explorationStage')}
-                  className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300"
-                />
-                <div className="ml-3">
-                  <span className="text-sm font-medium text-gray-700">{stage.label}</span>
-                  <span className="block text-xs text-gray-500">{stage.description}</span>
-                </div>
+              <label key={stage.value} className="choice">
+                <input type="radio" value={stage.value} {...register('explorationStage')} />
+                <span><span className="text-[16px] font-medium">{stage.label}</span><span className="block text-[14px] text-ink-soft">{stage.description}</span></span>
               </label>
             ))}
           </div>
         </div>
 
-        {/* AI Initiative Types with Expandable Descriptions */}
+        {/* Types */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            What type(s) of AI are you considering?
-            <Tooltip
-              content="Select all that apply. Click on each option to see examples."
-              type="info"
-            />
-          </label>
-          <div className="space-y-3">
+          <p className="font-serif text-[18px]">What kind of AI are you considering?</p>
+          <p className="text-[14px] text-ink-soft mt-0.5">Choose any that apply. "Examples" shows what each one looks like in practice.</p>
+          <div className="mt-2 max-w-xl">
             {aiTypes.map((type) => (
-              <div
-                key={type.value}
-                className="border rounded-lg p-3 hover:bg-gray-50 transition-colors"
-              >
-                <label className="flex items-start cursor-pointer">
-                  <input
-                    type="checkbox"
-                    value={type.value}
-                    {...register("aiInitiativeTypes", {
-                      validate: (value) =>
-                        value.length > 0 ||
-                        "Please select at least one initiative type",
-                    })}
-                    className="mt-1 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                  />
-                  <div className="ml-3 flex-grow">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        {type.icon}
-                        <span className="font-medium text-gray-900">
-                          {type.label}
-                        </span>
-                      </div>
-                      {type.examples.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            toggleExpanded(type.value);
-                          }}
-                          className="text-gray-400 hover:text-gray-600"
-                        >
-                          {expandedTypes.includes(type.value) ? (
-                            <ChevronUp className="w-4 h-4" />
-                          ) : (
-                            <ChevronDown className="w-4 h-4" />
-                          )}
-                        </button>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {type.description}
-                    </p>
-                    {expandedTypes.includes(type.value) &&
-                      type.examples.length > 0 && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="mt-2 pl-4 border-l-2 border-gray-200"
-                        >
-                          <p className="text-xs font-medium text-gray-500 mb-1">
-                            Examples:
-                          </p>
-                          <ul className="text-sm text-gray-600 space-y-1">
-                            {type.examples.map((example, idx) => (
-                              <li key={idx}>• {example}</li>
-                            ))}
-                          </ul>
-                        </motion.div>
-                      )}
-                  </div>
+              <div key={type.value} className="border-b border-rule py-2.5">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" value={type.value}
+                    {...register("aiInitiativeTypes", { validate: (value) => value.length > 0 || "Choose at least one" })}
+                    className="mt-1 h-4 w-4 border-2 border-ink text-ink bg-paper-light focus:ring-0 focus:ring-offset-0 rounded-none" />
+                  <span className="flex-1">
+                    <span className="text-[16px] font-medium">{type.label}</span>
+                    <span className="block text-[14px] text-ink-soft">{type.description}</span>
+                  </span>
                 </label>
+                {type.examples.length > 0 && (
+                  <div className="pl-7 mt-1">
+                    <button type="button" onClick={() => toggleExpanded(type.value)} aria-expanded={expandedTypes.includes(type.value)}
+                      className="font-display text-[12px] uppercase tracking-[0.08em] text-ink underline underline-offset-4 decoration-1 hover:text-signal">
+                      {expandedTypes.includes(type.value) ? "Hide examples" : "Examples"}
+                    </button>
+                    {expandedTypes.includes(type.value) && (
+                      <ul className="mt-1.5 text-[14px] text-ink-soft space-y-0.5 list-disc pl-4">
+                        {type.examples.map((example, idx) => <li key={idx}>{example}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
-          {errors.aiInitiativeTypes && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.aiInitiativeTypes.message}
-            </p>
-          )}
+          {errors.aiInitiativeTypes && <p className="mt-1 text-[14px] text-signal">{errors.aiInitiativeTypes.message as string}</p>}
         </div>
 
-        {/* Implementation Timeline */}
+        {/* Timeline */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Implementation Timeline
-            <Tooltip
-              content="When do you need this solution to be operational?"
-              type="info"
-            />
-          </label>
-          <select
-            {...register("implementationTimeline", {
-              required: "Please select a timeline",
-            })}
-            className="input-field"
-          >
-            <option value="">Select timeline...</option>
-            <option value="immediate">Immediate (within 1 month)</option>
-            <option value="3months">Short-term (1-3 months)</option>
-            <option value="6months">Medium-term (3-6 months)</option>
-            <option value="1year">Long-term (6-12 months)</option>
-            <option value="future">Future planning (12+ months)</option>
+          <label htmlFor="implementationTimeline" className="block font-serif text-[18px]">When would it need to be running?</label>
+          <select id="implementationTimeline" {...register("implementationTimeline", { required: "Choose a timeline" })} className="input-field mt-2 max-w-md">
+            <option value="">Choose one</option>
+            <option value="immediate">Within a month</option>
+            <option value="3months">One to three months</option>
+            <option value="6months">Three to six months</option>
+            <option value="1year">Six to twelve months</option>
+            <option value="future">More than a year out</option>
           </select>
-          {errors.implementationTimeline && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.implementationTimeline.message}
-            </p>
-          )}
+          {errors.implementationTimeline && <p className="mt-1 text-[14px] text-signal">{errors.implementationTimeline.message as string}</p>}
         </div>
 
-        {/* Impact Scale */}
+        {/* Scale */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Expected Impact Scale
-            <Tooltip
-              content="How broadly will this AI solution be deployed?"
-              type="info"
-            />
-          </label>
-          <select
-            {...register("impactScale", {
-              required: "Please select impact scale",
-            })}
-            className="input-field"
-          >
-            <option value="">Select scale...</option>
-            <option value="pilot">Pilot (single team or program)</option>
-            <option value="department">Department-wide</option>
-            <option value="organization-wide">Organization-wide</option>
-            <option value="network">Network/Coalition-wide</option>
+          <label htmlFor="impactScale" className="block font-serif text-[18px]">How widely would it be used?</label>
+          <select id="impactScale" {...register("impactScale", { required: "Choose a scale" })} className="input-field mt-2 max-w-md">
+            <option value="">Choose one</option>
+            <option value="pilot">A pilot: one team or programme</option>
+            <option value="department">One department</option>
+            <option value="organization-wide">The whole organisation</option>
+            <option value="network">A network or coalition</option>
           </select>
-          {errors.impactScale && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.impactScale.message}
-            </p>
-          )}
+          {errors.impactScale && <p className="mt-1 text-[14px] text-signal">{errors.impactScale.message as string}</p>}
         </div>
 
-        {/* Use Case Description */}
+        {/* Use case */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Describe your specific use case
-            <Tooltip
-              content="Be specific about what problem you're trying to solve and how AI might help."
-              type="info"
-            />
-          </label>
-          <textarea
-            {...register("initiativeDescription", {
-              required: "Please describe your use case",
-              maxLength: {
-                value: 500,
-                message: "Please keep your description under 500 characters",
-              },
-            })}
-            className="input-field"
-            rows={4}
-            placeholder="Example: We want to use AI to analyze donor patterns and predict giving trends to improve our fundraising strategies. Currently, our team spends 20 hours per week on manual donor research..."
-          />
-          <p className="text-xs text-gray-500 mt-1">
-            {data.initiativeDescription?.length || 0}/500 characters
-          </p>
-          {errors.initiativeDescription && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.initiativeDescription.message}
-            </p>
-          )}
+          <label htmlFor="initiativeDescription" className="block font-serif text-[18px]">Describe the use case in a few sentences</label>
+          <p className="text-[14px] text-ink-soft mt-0.5">What problem, for whom, and how AI might help. Specific beats polished.</p>
+          <textarea id="initiativeDescription"
+            {...register("initiativeDescription", { required: "A few sentences are enough", maxLength: { value: 500, message: "Keep it under 500 characters" } })}
+            className="input-field mt-2" rows={4}
+            placeholder="Our intake team spends about twenty hours a week answering the same benefits questions. We want an assistant that drafts answers for a caseworker to check before anything goes out." />
+          <p className="font-mono text-[12px] text-ink-soft mt-1">{description?.length || 0} of 500 characters</p>
+          {errors.initiativeDescription && <p className="mt-1 text-[14px] text-signal">{errors.initiativeDescription.message as string}</p>}
         </div>
 
-        {/* Expected Outcomes with Categories */}
+        {/* Outcomes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            What would success look like?
-            <Tooltip
-              content="Select all outcomes you hope to achieve. These will shape our success metrics recommendations."
-              type="info"
-            />
-          </label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <p className="font-serif text-[18px]">What would success look like?</p>
+          <p className="text-[14px] text-ink-soft mt-0.5">Choose any that apply. Each becomes a measure in the plan, set against your own baseline.</p>
+          <div className="mt-2 grid sm:grid-cols-2 gap-x-8 max-w-2xl">
             {outcomeOptions.map((option) => (
-              <label
-                key={option.value}
-                className="flex items-start p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
-              >
-                <input
-                  type="checkbox"
-                  value={option.value}
-                  {...register("expectedOutcomes", {
-                    validate: (value) =>
-                      value.length > 0 || "Please select at least one outcome",
-                  })}
-                  className="mt-0.5 h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                />
-                <div className="ml-3">
-                  <span className="text-sm font-medium text-gray-700">
-                    {option.label}
-                  </span>
-                  <span className="block text-xs text-gray-500">
-                    {option.impact}
-                  </span>
-                </div>
+              <label key={option.value} className="choice">
+                <input type="checkbox" value={option.value}
+                  {...register("expectedOutcomes", { validate: (value) => value.length > 0 || "Choose at least one" })} />
+                <span><span className="text-[16px]">{option.label}</span><span className="block font-mono text-[12px] text-ink-soft">{option.impact}</span></span>
               </label>
             ))}
           </div>
-          {errors.expectedOutcomes && (
-            <p className="mt-1 text-sm text-red-600">
-              {errors.expectedOutcomes.message}
-            </p>
-          )}
+          {errors.expectedOutcomes && <p className="mt-1 text-[14px] text-signal">{errors.expectedOutcomes.message as string}</p>}
         </div>
 
-        <div className="flex justify-between">
-          <motion.button
-            type="button"
-            onClick={onPrev}
-            className="btn-outline"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            ← Previous
-          </motion.button>
-          <motion.button
-            type="submit"
-            className="btn-primary"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            Next Step →
-          </motion.button>
+        <div className="hairline pt-5 flex justify-between">
+          <button type="button" onClick={onPrev} className="btn-outline">Back, section 1</button>
+          <button type="submit" className="btn-panel">Next, section 3</button>
         </div>
       </form>
     </div>

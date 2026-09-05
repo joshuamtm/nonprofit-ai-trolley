@@ -8,6 +8,7 @@ import {
   getRelevantRecommendations,
   generatePersonalizedRecommendations,
 } from "./recommendationTemplates";
+import { unprefixPlanItem } from "./roadNames";
 
 export class EnhancedAnalysisGenerator {
   private data: SessionData;
@@ -140,9 +141,9 @@ export class EnhancedAnalysisGenerator {
       benefits: this.generateDetailedBenefits(),
       risks: this.generateDetailedRisks(),
       recommendations: this.generateContextualRecommendations("aggressive"),
-      actionPlan30Days: personalized.immediate,
-      actionPlan60Days: personalized.shortTerm,
-      actionPlan90Days: personalized.longTerm,
+      actionPlan30Days: personalized.immediate.map(unprefixPlanItem),
+      actionPlan60Days: personalized.shortTerm.map(unprefixPlanItem),
+      actionPlan90Days: personalized.longTerm.map(unprefixPlanItem),
       budgetEstimates: this.estimateBudget("full"),
       requiredResources: this.identifyResources("full"),
       successMetrics: this.defineSuccessMetrics(),
@@ -150,16 +151,16 @@ export class EnhancedAnalysisGenerator {
       impactScore: this.calculateImpactScore("full"),
       tradeOffSummary: {
         gains: [
-          "Maximum efficiency gains",
-          "Competitive advantage",
-          "Scale potential",
-          "Data-driven insights",
+          "The fastest route to whatever gain is really there",
+          "One decision, one change, instead of a year of pilots",
+          "Scale from the start, if the workflow is sound",
+          "Early data on what the tools do for your work",
         ],
         losses: [
-          "Higher upfront costs",
-          "Greater risk exposure",
-          "Potential stakeholder resistance",
-          "Complex change management",
+          "Higher upfront cost, mostly staff time and data clean-up",
+          "A wrong output can reach a client before anyone sees it",
+          "Staff who were not brought along may resist, quietly",
+          "Undoing it is harder once it is everywhere",
         ],
       },
     };
@@ -172,23 +173,23 @@ export class EnhancedAnalysisGenerator {
       title: "Path 2: Don't Pull (Maintain Status Quo)",
       benefits: [
         "No disruption to current operations",
-        "Avoids AI-related risks entirely",
-        "No additional investment required",
-        "Maintains current stakeholder comfort",
-        "Preserves organizational culture",
+        "Avoids the risks of a formal AI system (though not of the informal use already happening)",
+        "No new investment required this year",
+        "Keeps stakeholders comfortable while the evidence base matures",
+        "Preserves the way the organization works today",
       ],
       risks: [
-        "Continued operational inefficiencies",
-        "Growing competitive disadvantage",
-        "Staff burnout from manual processes",
-        "Inability to scale services",
-        "Missed funding opportunities",
+        "Staff are probably already using unapproved AI tools; surveys of AI users at work put this near three in four, and holding off does not stop it, it only leaves it ungoverned",
+        "Demand keeps rising while capacity does not (in 2025 about half of nonprofits reported rising demand and roughly a third kept pace)",
+        "Staff burnout from manual work, which CEP's 2026 survey found at its highest level in three years",
+        "The learning gap widens: the organization is no better placed to judge AI next year than it is today",
+        "Funders are not yet pushing (only 17 percent of leaders had been engaged by a funder on AI in 2025), so the pressure, when it comes, will arrive later and faster",
       ],
       recommendations: [
-        "Optimize current manual processes",
-        "Invest in staff training and development",
-        "Explore non-AI technology improvements",
-        "Focus on incremental improvements",
+        "Adopt an acceptable-use policy and take an inventory of the AI use already happening; holding a use case is not the same as holding organizational learning",
+        "Fix the process first: document the bottleneck, its baseline, and what a good outcome would look like",
+        "Invest in staff training so the next AI decision is made by people who understand the tools",
+        "Set a date to revisit this decision, and name who owns it",
       ],
       opportunityCosts: this.calculateOpportunityCosts(),
       actionPlan30Days: [
@@ -215,15 +216,15 @@ export class EnhancedAnalysisGenerator {
       tradeOffSummary: {
         gains: [
           "Stability and predictability",
-          "No transition risks",
-          "Cost avoidance",
-          "Cultural preservation",
+          "No transition risk this year",
+          "Money kept for the mission",
+          "The organization's culture, as it is",
         ],
         losses: [
-          "Efficiency gains",
-          "Competitive position",
-          "Innovation opportunities",
-          "Scale potential",
+          "Governance of the AI use that is already happening",
+          "Learning while the stakes are low",
+          "Staff hours on routine work",
+          "Position when funders do start asking",
         ],
       },
     };
@@ -252,22 +253,22 @@ export class EnhancedAnalysisGenerator {
       mitigationStrategies: mitigationPlaybook.map((m) => m.strategy),
       mitigationPlaybook,
       actionPlan30Days: [
-        "Form AI ethics committee",
-        "Develop implementation framework",
-        "Identify pilot use case",
-        ...personalized.immediate.slice(0, 2),
+        "Name the people who will own the decision, including one sceptic",
+        "Write down the one workflow the pilot covers, and what it must not touch",
+        "Take a baseline: how long the work takes today, and how often it goes wrong",
+        ...personalized.immediate.slice(0, 1).map(unprefixPlanItem),
       ],
       actionPlan60Days: [
-        "Launch limited pilot",
-        "Establish monitoring systems",
-        "Begin staff training",
-        ...personalized.shortTerm.slice(0, 2),
+        "Run the pilot with a person checking every output before it reaches anyone",
+        "Log errors, near misses and the time saved, weekly",
+        "Train the staff on the pilot, including how to say no to the tool",
+        ...personalized.shortTerm.slice(0, 1).map(unprefixPlanItem),
       ],
       actionPlan90Days: [
-        "Evaluate pilot results",
-        "Refine approach based on learnings",
-        "Plan next phase expansion",
-        ...personalized.longTerm.slice(0, 2),
+        "Compare the log against the baseline and decide: widen, hold, or stop",
+        "Adjust the acceptable use policy from what the pilot taught you",
+        "Report to the board with the numbers, not the story",
+        ...personalized.longTerm.slice(0, 1).map(unprefixPlanItem),
       ],
       budgetEstimates: this.estimateBudget("phased"),
       requiredResources: this.identifyResources("phased"),
@@ -284,16 +285,15 @@ export class EnhancedAnalysisGenerator {
       impactScore: this.calculateImpactScore("phased"),
       tradeOffSummary: {
         gains: [
-          "Risk mitigation",
-          "Stakeholder buy-in",
-          "Learning opportunity",
-          "Ethical alignment",
+          "A stop rule, so a bad result stays small",
+          "Staff and board brought along before the stakes rise",
+          "A baseline and a log, which is what a funder will ask for",
+          "The chance to learn on one workflow before betting on ten",
         ],
         losses: [
-          "Speed of implementation",
-          "Some efficiency gains",
-          "First-mover advantage",
-          "Simplicity",
+          "Speed: the first months are slower than a full launch",
+          "Some of the gains, while the checking step is still in place",
+          "The attention of the people who own the pilot",
         ],
       },
     };
@@ -308,26 +308,30 @@ export class EnhancedAnalysisGenerator {
       benefits.push("Ability to handle current backlog efficiently");
     }
 
-    // Outcome-specific benefits
+    // Outcome-specific benefits. Evidence note (Sept 2026): published nonprofit gains are
+    // real but modest, and the widely repeated "60-80% faster" figure has no nonprofit study
+    // behind it. The largest independent sample found (Section/eMarketer, 2026, n=5,000)
+    // puts most users' savings under four hours a week. So: name the mechanism, ask for a
+    // baseline, and do not promise a percentage.
     if (this.data.expectedOutcomes.includes("serve_more")) {
       benefits.push(
-        `Serve ${this.data.impactScale === "organization-wide" ? "50-75%" : "25-40%"} more beneficiaries`,
+        `Reach more people with the same staff once the workflow is proven${this.data.impactScale === "organization-wide" ? " across the organization" : ""}; measure against your current caseload, and expect modest gains at first`,
       );
     }
 
     if (this.data.expectedOutcomes.includes("reduce_time")) {
-      benefits.push("Reduce processing time by 60-80%");
+      benefits.push("Reclaim staff time on routine drafting, intake, and case notes; measured gains for most users are under four hours a week, so set a baseline before you start");
     }
 
     if (this.data.expectedOutcomes.includes("increase_revenue")) {
-      benefits.push("Increase fundraising efficiency and donor retention");
-      benefits.push("Identify new revenue opportunities through data insights");
+      benefits.push("Faster grant and appeal drafting, with more time for the relationships that actually raise money");
+      benefits.push("Better use of the donor data you already hold, provided it is clean enough to trust");
     }
 
     // Scale-based benefits
     if (this.data.impactScale === "organization-wide") {
-      benefits.push("Transform organizational capabilities");
-      benefits.push("Create competitive advantage in sector");
+      benefits.push("Build the organization's own judgment about AI before funders or peers force the question");
+      benefits.push("One policy, one set of approved tools, and one place to learn from mistakes, instead of forty private experiments");
     }
 
     return benefits;
@@ -478,31 +482,36 @@ export class EnhancedAnalysisGenerator {
       return `${fmt(low)}-${fmt(high)}`;
     };
 
+    // Planning bands only. No independent, nonprofit-specific cost benchmark existed as of
+    // September 2026; the published tiers are vendor estimates (small orgs $5K-$25K initial,
+    // mid-size $25K-$100K, large $100K-$500K). These bands sit at the lower half of those and
+    // assume most of the spend is staff time, data clean-up, training, and review, not licences.
+    const band = " (planning band, not a quote)";
     if (implementation === "full") {
-      const initLow = sizeMultiplier * 40000;
-      const initHigh = sizeMultiplier * 90000;
-      const ongoingLow = sizeMultiplier * 15000;
-      const ongoingHigh = sizeMultiplier * 35000;
+      const initLow = sizeMultiplier * 15000;
+      const initHigh = sizeMultiplier * 45000;
+      const ongoingLow = sizeMultiplier * 8000;
+      const ongoingHigh = sizeMultiplier * 20000;
       return {
         initial: formatRange(initLow, initHigh),
         ongoing: `${formatRange(ongoingLow, ongoingHigh)}/year`,
-        total: `${formatRange(initLow + ongoingLow * 3, initHigh + ongoingHigh * 3)} over 3 years`,
+        total: `${formatRange(initLow + ongoingLow * 3, initHigh + ongoingHigh * 3)} over 3 years${band}`,
       };
     } else if (implementation === "phased") {
-      const initLow = sizeMultiplier * 15000;
-      const initHigh = sizeMultiplier * 35000;
-      const ongoingLow = sizeMultiplier * 10000;
-      const ongoingHigh = sizeMultiplier * 25000;
+      const initLow = sizeMultiplier * 8000;
+      const initHigh = sizeMultiplier * 25000;
+      const ongoingLow = sizeMultiplier * 5000;
+      const ongoingHigh = sizeMultiplier * 15000;
       return {
         initial: formatRange(initLow, initHigh),
         ongoing: `${formatRange(ongoingLow, ongoingHigh)}/year`,
-        total: `${formatRange(initLow + ongoingLow * 3, initHigh + ongoingHigh * 3)} over 3 years`,
+        total: `${formatRange(initLow + ongoingLow * 3, initHigh + ongoingHigh * 3)} over 3 years${band}`,
       };
     } else {
       return {
-        initial: "$0 for AI",
-        ongoing: "Current operational costs + potential staff additions",
-        total: "No additional AI investment",
+        initial: "$0 for a formal AI system; a policy and an inventory of existing use cost staff time",
+        ongoing: "Current operating costs, plus the cost of demand that keeps rising while capacity does not",
+        total: "No AI investment, but not no cost",
       };
     }
   }
@@ -575,18 +584,20 @@ export class EnhancedAnalysisGenerator {
     const metrics: string[] = [];
 
     // Outcome-based metrics
+    // Targets are set against the organization's own pre-pilot baseline. Published
+    // percentages ("+40%", "-60%") are not supported by nonprofit evidence and are not used.
     if (this.data.expectedOutcomes.includes("serve_more")) {
-      metrics.push("Number of beneficiaries served (target: +40%)");
+      metrics.push("People served per month, against a documented pre-pilot baseline");
     }
     if (this.data.expectedOutcomes.includes("reduce_time")) {
-      metrics.push("Average processing time (target: -60%)");
+      metrics.push("Minutes per case or task, measured before and after, with the review time included");
     }
     if (this.data.expectedOutcomes.includes("improve_quality")) {
-      metrics.push("Decision accuracy rate (target: >95%)");
+      metrics.push("Error and rework rate on AI-assisted work (target: no worse than today, then better)");
     }
     if (this.data.expectedOutcomes.includes("increase_revenue")) {
-      metrics.push("Revenue growth rate (target: +15-25%)");
-      metrics.push("Donor retention rate (target: +10%)");
+      metrics.push("Grant and appeal throughput, and the win rate, tracked separately");
+      metrics.push("Donor retention year over year (do not attribute change to AI without a comparison group)");
     }
 
     // Standard metrics
@@ -676,7 +687,7 @@ export class EnhancedAnalysisGenerator {
       return {
         recommendedPath: "Pull the Lever (Full Implementation)",
         rationale:
-          "Your critical urgency combined with good organizational readiness suggests moving forward quickly with full implementation while managing risks actively.",
+          "You rated the need as urgent and your organisation as ready, and your concerns are not the kind that a slower start would settle. Adopt now, with a named owner, a baseline, and a weekly look at what the tools are getting wrong.",
       };
     }
 
@@ -685,13 +696,13 @@ export class EnhancedAnalysisGenerator {
         return {
           recommendedPath: "Don't Pull (Status Quo)",
           rationale:
-            "High risk concerns and/or low stakeholder alignment, combined with non-urgent timeline, suggest focusing on preparation before considering AI implementation.",
+            "Your concerns rate high, your stakeholders are not with you yet, and nothing in your answers says this must happen this quarter. Hold, but not still: write the acceptable use policy and find out what staff are already using, because that road is already occupied.",
         };
       } else {
         return {
           recommendedPath: "Pull with Safeguards",
           rationale:
-            "Your significant concerns require a careful approach, but the urgency of your needs means you should proceed with robust safeguards and phased implementation.",
+            "Your concerns rate high enough that a full launch would carry risks you have not priced yet, and your timeline is too tight to hold. Take one workflow, put a person between the tool and the client, set a stop rule, and widen only when the log says so.",
         };
       }
     }
@@ -700,7 +711,7 @@ export class EnhancedAnalysisGenerator {
     return {
       recommendedPath: "Pull with Safeguards",
       rationale:
-        "A phased approach with safeguards balances your need for AI benefits with appropriate risk management and stakeholder engagement.",
+        "Nothing in your answers argues for a full launch or for holding. Most organisations in this position do best on the crossover: a bounded pilot with a baseline, a checking step, and a stop rule, which keeps the gain and keeps the mistakes small.",
     };
   }
 

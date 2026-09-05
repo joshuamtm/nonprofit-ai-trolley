@@ -1,39 +1,38 @@
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Download, Eye, CheckCircle, XCircle, BookOpen, ArrowRight } from "lucide-react";
 import { SessionData } from "../../types";
 import { EnhancedAnalysisGenerator } from "../../utils/enhancedAnalysisGenerator";
 import { generateEnhancedPDF } from "../../utils/pdfReport";
 import ComparisonView from "../ComparisonView";
 import TrolleyScene from "../TrolleyAnimation/TrolleyScene";
+import { topConcerns } from "../CarbonStrip";
+import { roadName, unprefixPlanItem } from "../../utils/roadNames";
 
 interface EnhancedReviewStepProps {
   data: SessionData;
   onPrev: () => void;
 }
 
-const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({
-  data,
-  onPrev,
-}) => {
+// Titles arrive as "Path 2: Don't Pull (Maintain Status Quo)" or "Pull with Safeguards";
+// the reader sees the panel name only, the same one the diagram and the cards use.
+const plainTitle = roadName;
+
+const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({ data, onPrev }) => {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [showComparison, setShowComparison] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(true);
-  const [, setAnalysisSource] = useState<'ai' | 'template'>('template');
+  const [analysisSource, setAnalysisSource] = useState<'ai' | 'template'>('template');
 
   useEffect(() => {
     const fetchAnalysis = async () => {
       setIsAnalyzing(true);
-
       try {
         const response = await fetch('/api/analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
-
         if (response.ok) {
           const aiAnalysis = await response.json();
           if (!aiAnalysis.fallback && aiAnalysis.recommendedPath) {
@@ -44,17 +43,13 @@ const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({
           }
         }
       } catch (err) {
-        console.log('AI analysis unavailable, using template fallback');
+        // fall through to the template
       }
-
-      // Fallback to template-based analysis
       const generator = new EnhancedAnalysisGenerator(data);
-      const templateAnalysis = generator.generateEnhancedAnalysis();
-      setAnalysis(templateAnalysis);
+      setAnalysis(generator.generateEnhancedAnalysis());
       setAnalysisSource('template');
       setIsAnalyzing(false);
     };
-
     fetchAnalysis();
   }, [data]);
 
@@ -75,54 +70,19 @@ const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({
     setIsGenerating(false);
   };
 
-  const handlePathSelect = (path: "pull" | "dont-pull" | "safeguards") => {
-    setSelectedPath(path);
-  };
-
-  const getPathDetails = () => {
+  const pathDetails = (() => {
     if (!analysis) return null;
-
     switch (selectedPath) {
-      case "pull":
-        return {
-          title: analysis.pullLever.title,
-          description: "Moving forward with full AI implementation, accepting calculated risks for maximum benefits.",
-          color: "text-signal-green",
-          bgColor: "bg-signal-green/5",
-          borderColor: "border-signal-green/20",
-          accentColor: "#16A34A",
-          analysis: analysis.pullLever,
-        };
-      case "dont-pull":
-        return {
-          title: analysis.dontPull.title,
-          description: "Maintaining current operations without AI, preserving stability while addressing limitations.",
-          color: "text-signal-blue",
-          bgColor: "bg-signal-blue/5",
-          borderColor: "border-signal-blue/20",
-          accentColor: "#2563EB",
-          analysis: analysis.dontPull,
-        };
-      case "safeguards":
-        return {
-          title: analysis.withSafeguards.title,
-          description: "Phased AI implementation with comprehensive safeguards, balancing innovation with risk management.",
-          color: "text-signal-amber",
-          bgColor: "bg-signal-amber/5",
-          borderColor: "border-signal-amber/20",
-          accentColor: "#D97706",
-          analysis: analysis.withSafeguards,
-        };
-      default:
-        return null;
+      case "pull": return { title: analysis.pullLever.title, plain: "Adopt AI across the initiative now, accepting the risks for the fastest gain.", analysis: analysis.pullLever, occupied: false };
+      case "dont-pull": return { title: analysis.dontPull.title, plain: "Hold the status quo. A choice with its own costs, listed below.", analysis: analysis.dontPull, occupied: true };
+      case "safeguards": return { title: analysis.withSafeguards.title, plain: "Adopt in stages, with a person checking, a baseline, and a stop rule.", analysis: analysis.withSafeguards, occupied: false };
+      default: return null;
     }
-  };
-
-  const pathDetails = getPathDetails();
+  })();
 
   if (showComparison && analysis) {
     return (
-      <div className="space-y-6">
+      <div className="mt-6">
         <ComparisonView
           data={data}
           pullLever={analysis.pullLever}
@@ -131,245 +91,147 @@ const EnhancedReviewStep: React.FC<EnhancedReviewStepProps> = ({
           recommendedPath={analysis.recommendedPath}
           rationale={analysis.rationale}
         />
-        <div className="flex justify-between">
-          <button onClick={() => setShowComparison(false)} className="btn-outline">
-            ← Back to Analysis
+        <div className="rule-top mt-8 pt-5">
+          <button onClick={handleGeneratePDF} disabled={isGenerating} className="btn-panel w-full sm:w-auto sm:min-w-[24rem] py-4 text-[16px]">
+            {isGenerating ? "Preparing the PDF" : "Take the carbon to your board, PDF"}
           </button>
-          <button
-            onClick={handleGeneratePDF}
-            disabled={isGenerating}
-            className="btn-primary flex items-center gap-2"
-          >
-            <Download className="w-4 h-4" />
-            {isGenerating ? "Generating..." : "Download Report"}
-          </button>
+          <div className="mt-5 font-display text-[13px] uppercase tracking-[0.08em]">
+            <button onClick={() => setShowComparison(false)} className="underline underline-offset-4 decoration-1 text-ink hover:text-signal">Back to the diagram</button>
+          </div>
         </div>
       </div>
     );
   }
 
-  // Loading state
   if (isAnalyzing) {
     return (
-      <div className="card text-center py-16">
-        <motion.div
-          animate={{ x: [0, 200, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="inline-block mb-6"
-        >
-          <svg className="w-16 h-10" viewBox="0 0 80 50" fill="none">
-            <rect x="10" y="15" width="40" height="22" rx="5" fill="#1B4D3E" />
-            <rect x="16" y="8" width="28" height="14" rx="3" fill="#2A7A5E" />
-            <circle cx="20" cy="40" r="5" fill="#57534E" />
-            <circle cx="40" cy="40" r="5" fill="#57534E" />
-          </svg>
-        </motion.div>
-        <h2 className="font-display text-title mb-2">Analyzing Your Responses</h2>
-        <p className="text-text-muted text-sm">
-          Generating your personalized three-path analysis...
-        </p>
+      <div className="mt-6" aria-live="polite">
+        <p className="rubric hidden sm:block">Section 5 of 5 · the analysis</p>
+        <h2 className="font-display font-semibold text-heading uppercase mt-1">Setting the road</h2>
+        <p className="font-serif text-[17px] mt-2 max-w-[58ch]">Reading your answers and writing the register entry. About ten seconds. If the advisor is unavailable, the template engine takes over.</p>
+        <div className="mt-6 border-2 border-ink bg-paper-light h-3 overflow-hidden" aria-hidden="true">
+          <div className="h-full w-1/3 bg-ink animate-pulse" />
+        </div>
       </div>
     );
   }
 
+  const gains: string[] = pathDetails?.analysis.tradeOffSummary?.gains || [];
+  const losses: string[] = pathDetails?.analysis.tradeOffSummary?.losses || [];
+
   return (
-    <div className="space-y-6">
-      <div className="card">
-        <h2 className="font-display text-title mb-2">Your AI Decision Analysis</h2>
-        <p className="text-sm text-text-muted mb-6">
-          Based on your responses, here's our personalized recommendation.
-        </p>
+    <div className="mt-6">
+      <p className="rubric hidden sm:block">Section 5 of 5 · the analysis</p>
+      <h2 className="font-display font-semibold text-heading uppercase mt-1">Your line has reached the facing point. Three roads leave it.</h2>
+      <p className="font-serif text-[17px] mt-2 max-w-[60ch]">A facing point is a switch a trolley meets head-on, where it must take one road. Green lamps mean line clear. Red lamps mean a section is already occupied, which is what the "don't pull" road looks like from where you are standing.</p>
 
-        {/* Recommended Path Banner */}
-        {analysis && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mb-6 p-5 bg-primary/5 border border-primary/15 rounded-xl"
-          >
-            <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <CheckCircle className="w-4 h-4 text-primary" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-primary text-base mb-1">
-                  Recommended: {analysis.recommendedPath}
-                </h3>
-                <p className="text-sm text-textDark/70">{analysis.rationale}</p>
-              </div>
-            </div>
-          </motion.div>
-        )}
+      {/* Register entry: the recommendation */}
+      {analysis && (
+        <div className="rule-top mt-6 pt-4" aria-live="polite">
+          <p className="rubric">Register entry · {analysisSource === 'ai' ? 'written for your answers by the AI advisor' : 'standard reasoning; the live advisor was not reached this time'}</p>
+          <dl className="mt-2 grid grid-cols-1 sm:grid-cols-[7rem_1fr] gap-x-4 gap-y-1.5 text-[16px]">
+            <dt className="rubric pt-1">Line taken</dt>
+            <dd className="font-display font-semibold uppercase text-[18px]">{plainTitle(analysis.recommendedPath)}</dd>
+            <dt className="rubric pt-1 sm:mt-0 mt-2">Reason</dt>
+            <dd className="font-serif">{analysis.rationale}</dd>
+          </dl>
+        </div>
+      )}
 
-        {/* Trolley Animation */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="mb-6"
-        >
-          <p className="text-xs text-text-muted mb-3 uppercase tracking-wider font-semibold">
-            Explore your three paths
-          </p>
-          <TrolleyScene
-            onPathSelect={handlePathSelect}
-            recommendedPath={analysis?.recommendedPath}
-          />
-        </motion.div>
+      {/* The diagram */}
+      <div className="mt-6">
+        <TrolleyScene
+          onPathSelect={(p) => setSelectedPath(p)}
+          recommendedPath={analysis?.recommendedPath}
+          concerns={topConcerns(data)}
+        />
+      </div>
 
-        {/* Path Details Display */}
-        {pathDetails && (
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`p-6 rounded-xl border-2 ${pathDetails.borderColor} ${pathDetails.bgColor}`}
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className={`text-lg font-bold ${pathDetails.color}`}>
-                {pathDetails.title}
-              </h3>
-              {pathDetails.analysis.impactScore && (
-                <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/80">
-                  <span className="text-xs font-medium text-text-muted">Impact</span>
-                  <span className={`text-sm font-bold ${
-                    pathDetails.analysis.impactScore >= 60 ? 'text-signal-green'
-                    : pathDetails.analysis.impactScore >= 35 ? 'text-signal-amber'
-                    : 'text-secondary'
-                  }`}>
-                    {pathDetails.analysis.impactScore}/100
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <p className="text-sm text-textDark/70 mb-5">{pathDetails.description}</p>
-
-            {/* Trade-offs */}
-            {pathDetails.analysis.tradeOffSummary && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
-                <div>
-                  <h4 className="font-semibold text-sm mb-2 text-signal-green flex items-center gap-1.5">
-                    <CheckCircle className="w-3.5 h-3.5" /> What You Gain
-                  </h4>
-                  <ul className="space-y-1.5">
-                    {pathDetails.analysis.tradeOffSummary.gains.map((gain: string, i: number) => (
-                      <li key={i} className="text-sm text-textDark/80 flex items-start gap-2">
-                        <ArrowRight className="w-3 h-3 text-signal-green mt-1 flex-shrink-0" />
-                        {gain}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-semibold text-sm mb-2 text-secondary flex items-center gap-1.5">
-                    <XCircle className="w-3.5 h-3.5" /> What You Risk
-                  </h4>
-                  <ul className="space-y-1.5">
-                    {pathDetails.analysis.tradeOffSummary.losses.map((loss: string, i: number) => (
-                      <li key={i} className="text-sm text-textDark/80 flex items-start gap-2">
-                        <ArrowRight className="w-3 h-3 text-secondary mt-1 flex-shrink-0" />
-                        {loss}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
+      {/* Road details */}
+      {pathDetails && (
+        <div className="rule-top mt-8 pt-5">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+            <h3 className="font-display font-semibold text-heading uppercase">{plainTitle(pathDetails.title)}</h3>
+            {pathDetails.analysis.impactScore != null && (
+              <span className="font-mono text-[13px] text-ink-soft">impact score {pathDetails.analysis.impactScore} of 100 · a quantity, not a verdict</span>
             )}
-
-            {/* Action Plan */}
-            {(pathDetails.analysis.actionPlan30Days || pathDetails.analysis.actionPlan60Days) && (
-              <div className="border-t border-rail-light pt-4">
-                <h4 className="font-semibold text-sm mb-3 text-textDark">Your Roadmap</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {[
-                    { label: '30 Days', items: pathDetails.analysis.actionPlan30Days },
-                    { label: '60 Days', items: pathDetails.analysis.actionPlan60Days },
-                    { label: '90 Days', items: pathDetails.analysis.actionPlan90Days },
-                  ].filter(p => p.items?.length).map((period) => (
-                    <div key={period.label} className="bg-white/60 rounded-lg p-3">
-                      <h5 className="text-xs font-bold text-text-muted mb-2 uppercase tracking-wider">
-                        {period.label}
-                      </h5>
-                      <ul className="text-xs text-textDark/70 space-y-1">
-                        {period.items?.slice(0, 3).map((action: string, i: number) => (
-                          <li key={i}>• {action}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Budget Estimates */}
-            {pathDetails.analysis.budgetEstimates && (
-              <div className="mt-4 p-3 bg-white/60 rounded-lg">
-                <h5 className="text-xs font-bold text-text-muted mb-2 uppercase tracking-wider">
-                  Budget Estimates
-                </h5>
-                <div className="grid grid-cols-3 gap-2 text-sm">
-                  <div>
-                    <span className="text-xs text-text-muted">Initial</span>
-                    <p className="font-semibold text-textDark text-xs">{pathDetails.analysis.budgetEstimates.initial}</p>
-                  </div>
-                  <div>
-                    <span className="text-xs text-text-muted">Ongoing</span>
-                    <p className="font-semibold text-textDark text-xs">{pathDetails.analysis.budgetEstimates.ongoing}</p>
-                  </div>
-                  <div>
-                    <span className="text-xs text-text-muted">3-Year Total</span>
-                    <p className="font-semibold text-textDark text-xs">{pathDetails.analysis.budgetEstimates.total}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </motion.div>
-        )}
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mt-8 pt-6 border-t border-rail-light">
-          <motion.button
-            onClick={onPrev}
-            className="btn-outline text-sm"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            ← Previous
-          </motion.button>
-
-          <div className="flex gap-3">
-            <motion.button
-              onClick={() => window.open('/methodology', '_blank')}
-              className="btn-outline text-sm flex items-center gap-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <BookOpen className="w-4 h-4" />
-              <span className="hidden sm:inline">Methodology</span>
-            </motion.button>
-
-            <motion.button
-              onClick={() => setShowComparison(true)}
-              className="btn-outline text-sm flex items-center gap-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Eye className="w-4 h-4" />
-              <span className="hidden sm:inline">Compare Paths</span>
-            </motion.button>
-
-            <motion.button
-              onClick={handleGeneratePDF}
-              disabled={isGenerating}
-              className="btn-primary text-sm flex items-center gap-2"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Download className="w-4 h-4" />
-              {isGenerating ? "Generating..." : "Download Report"}
-            </motion.button>
           </div>
+          <p className="font-serif text-[16.5px] mt-1 max-w-[60ch]">{pathDetails.plain}</p>
+
+          <div className="mt-5 grid md:grid-cols-2 gap-x-10 gap-y-5">
+            <div>
+              <h4 className="font-serif font-semibold text-[17px] mb-2">What you gain</h4>
+              <ul className="space-y-1.5 text-[15.5px]">
+                {gains.map((g, i) => <li key={i} className="flex gap-3"><span className="mt-2 h-2.5 w-2.5 bg-sage flex-shrink-0" aria-hidden="true" />{g}</li>)}
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-serif font-semibold text-[17px] mb-2">{pathDetails.occupied ? 'What the road is already carrying' : 'What you give up'}</h4>
+              <ul className="space-y-1.5 text-[15.5px]">
+                {losses.map((l, i) => <li key={i} className="flex gap-3"><span className="mt-2 h-2.5 w-2.5 bg-signal flex-shrink-0" aria-hidden="true" />{l}</li>)}
+              </ul>
+            </div>
+          </div>
+
+          {(pathDetails.analysis.risks?.length > 0) && (
+            <div className="hairline mt-5 pt-4">
+              <h4 className="font-serif font-semibold text-[17px] mb-2">What could go wrong on this road, given your answers</h4>
+              <ul className="space-y-1.5 text-[15px]">
+                {pathDetails.analysis.risks.slice(0, 5).map((r: string, i: number) => <li key={i} className="flex gap-3"><span className="mt-2 h-2.5 w-2.5 border border-ink flex-shrink-0" aria-hidden="true" />{r}</li>)}
+              </ul>
+            </div>
+          )}
+
+          {(pathDetails.analysis.actionPlan30Days || pathDetails.analysis.actionPlan60Days) && (
+            <div className="hairline mt-5 pt-4">
+              <h4 className="font-serif font-semibold text-[17px] mb-2">The next ninety days on this road</h4>
+              <div className="grid md:grid-cols-3 gap-x-6 gap-y-4">
+                {[
+                  { label: 'Days 1 to 30', items: pathDetails.analysis.actionPlan30Days },
+                  { label: 'Days 31 to 60', items: pathDetails.analysis.actionPlan60Days },
+                  { label: 'Days 61 to 90', items: pathDetails.analysis.actionPlan90Days },
+                ].filter(p => p.items?.length).map((period) => (
+                  <div key={period.label}>
+                    <p className="font-display font-semibold uppercase text-[13px] tracking-[0.06em] border-b border-ink pb-1 mb-2">{period.label}</p>
+                    <ul className="text-[14.5px] space-y-1">
+                      {period.items?.slice(0, 4).map((a: string, i: number) => <li key={i} className="flex gap-2"><span className="font-mono text-[12px] text-ink-soft pt-0.5">{String(i + 1).padStart(2, '0')}</span><span>{unprefixPlanItem(a)}</span></li>)}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {pathDetails.analysis.budgetEstimates && (
+            <div className="hairline mt-5 pt-4">
+              <h4 className="font-serif font-semibold text-[17px] mb-2">Budget, as a planning band</h4>
+              <table className="ledger max-w-xl">
+                <tbody>
+                  <tr><td className="w-40 text-ink-soft">Initial</td><td className="font-mono">{pathDetails.analysis.budgetEstimates.initial}</td></tr>
+                  <tr><td className="text-ink-soft">Ongoing</td><td className="font-mono">{pathDetails.analysis.budgetEstimates.ongoing}</td></tr>
+                  <tr><td className="text-ink-soft">Three years</td><td className="font-mono">{pathDetails.analysis.budgetEstimates.total}</td></tr>
+                </tbody>
+              </table>
+              <p className="mt-2 text-[13px] text-ink-soft max-w-[60ch]">No independent nonprofit cost benchmark exists as of September 2026. Most of the spend is staff time, data clean-up, training, and review, not licences.</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {!pathDetails && (
+        <p className="mt-4 text-[15px] text-ink-soft">Choose a road above to read its full analysis. The recommended one is marked.</p>
+      )}
+
+      {/* Actions: the primary on its own row, the rest as quiet links */}
+      <div className="rule-top mt-8 pt-5">
+        <button onClick={handleGeneratePDF} disabled={isGenerating} className="btn-panel w-full sm:w-auto sm:min-w-[24rem] py-4 text-[16px]">
+          {isGenerating ? "Preparing the PDF" : "Take the carbon to your board, PDF"}
+        </button>
+        <p className="mt-2 font-mono text-[12px] text-ink-soft">Generated in your browser. Nothing is uploaded.</p>
+        <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 font-display text-[13px] uppercase tracking-[0.08em]">
+          <button onClick={() => setShowComparison(true)} className="underline underline-offset-4 decoration-1 text-ink hover:text-signal">Compare the three roads</button>
+          <a href="/methodology" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4 decoration-1 text-ink hover:text-signal">Method and sources</a>
+          <button onClick={onPrev} className="underline underline-offset-4 decoration-1 text-ink-soft hover:text-signal">Back to section 4</button>
         </div>
       </div>
     </div>

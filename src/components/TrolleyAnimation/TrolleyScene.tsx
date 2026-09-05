@@ -1,274 +1,146 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { roadFromLabel } from '../../utils/roadNames';
+
+// The facing point on the panel. One line enters from the left and splits into three roads:
+// the diverging road (pull the lever), the crossover (pull with care), and the straight-through
+// (don't pull). Each road is drawn as track sections with a lamp. The recommended road lights
+// sage, section by section, and stays lit. The straight-through road is never drawn empty: its
+// lamps are lit red and labelled with the visitor's own top concerns. Choosing another road to
+// read it thickens that road without unlighting the recommendation.
+type PathId = 'pull' | 'dont-pull' | 'safeguards';
 
 interface TrolleySceneProps {
-  onPathSelect: (path: 'pull' | 'dont-pull' | 'safeguards') => void;
+  onPathSelect: (path: PathId) => void;
   recommendedPath?: string;
+  concerns?: string[];       // labels for the occupied status-quo road
 }
 
-const TrolleyScene: React.FC<TrolleySceneProps> = ({ onPathSelect, recommendedPath }) => {
-  const [selectedPath, setSelectedPath] = useState<string | null>(null);
-  const [, setAnimationComplete] = useState(false);
+const pathFromLabel = roadFromLabel;
 
-  // Auto-animate to recommended path on mount
+const ROADS: { id: PathId; label: string; plain: string; y: number; d: string; lampXs: number[] }[] = [
+  { id: 'pull', label: 'Pull the lever', plain: 'the diverging road: adopt AI now', y: 70, d: 'M 260 160 C 320 160 340 70 400 70 L 640 70', lampXs: [430, 490, 550, 610] },
+  { id: 'safeguards', label: 'Pull with care', plain: 'the crossover: adopt in stages, with a person checking', y: 115, d: 'M 260 160 C 330 160 350 115 410 115 L 640 115', lampXs: [430, 490, 550, 610] },
+  { id: 'dont-pull', label: "Don't pull", plain: 'the straight-through: hold the status quo', y: 160, d: 'M 260 160 L 640 160', lampXs: [330, 400, 470, 540, 610] },
+];
+
+const LAMP_COLOR: Record<PathId, string> = { pull: '#14202B', safeguards: '#5E7A5A', 'dont-pull': '#B3261E' };
+
+const TrolleyScene: React.FC<TrolleySceneProps> = ({ onPathSelect, recommendedPath, concerns = [] }) => {
+  const reduceMotion = useReducedMotion();
+  const recommended = pathFromLabel(recommendedPath);
+  const [reading, setReading] = useState<PathId | null>(null);
+  const [litCount, setLitCount] = useState(0);
+  const scroller = useRef<HTMLDivElement>(null);
+
+  // On a phone the diagram is wider than the screen. Start it scrolled to the lamps, the
+  // road names and the trolley, which is the part that carries the answer; the entering
+  // line is a swipe to the left.
   useEffect(() => {
-    if (recommendedPath) {
-      const timer = setTimeout(() => {
-        const pathMap: Record<string, 'pull' | 'dont-pull' | 'safeguards'> = {
-          'Pull the Lever (Full Implementation)': 'pull',
-          'Pull with Safeguards': 'safeguards',
-          "Don't Pull (Status Quo)": 'dont-pull',
-        };
-        // Match partial strings
-        const key = Object.keys(pathMap).find(k =>
-          recommendedPath.toLowerCase().includes(k.toLowerCase().slice(0, 10))
-        );
-        if (key) {
-          setSelectedPath(pathMap[key]);
-        } else if (recommendedPath.toLowerCase().includes('safeguard') || recommendedPath.toLowerCase().includes('care')) {
-          setSelectedPath('safeguards');
-        } else if (recommendedPath.toLowerCase().includes('pull') && !recommendedPath.toLowerCase().includes("don't")) {
-          setSelectedPath('pull');
-        } else {
-          setSelectedPath('dont-pull');
-        }
-      }, 800);
-      return () => clearTimeout(timer);
-    }
-  }, [recommendedPath]);
+    const el = scroller.current;
+    if (!el) return;
+    if (el.scrollWidth > el.clientWidth + 8) el.scrollLeft = el.scrollWidth - el.clientWidth;
+  }, []);
 
-  const handlePathClick = (path: 'pull' | 'dont-pull' | 'safeguards') => {
-    setSelectedPath(path);
-    setAnimationComplete(false);
-    onPathSelect(path);
-  };
+  // Reveal: the trolley takes the recommended road and its lamps light one by one.
+  useEffect(() => {
+    if (!recommended) return;
+    const road = ROADS.find(r => r.id === recommended)!;
+    const t = setTimeout(() => { setReading(recommended); onPathSelect(recommended); }, reduceMotion ? 0 : 500);
+    if (reduceMotion) { setLitCount(road.lampXs.length); return () => clearTimeout(t); }
+    setLitCount(0);
+    let i = 0;
+    const id = setInterval(() => {
+      i += 1;
+      setLitCount(i);
+      if (i >= road.lampXs.length) clearInterval(id);
+    }, 350);
+    return () => { clearTimeout(t); clearInterval(id); };
+    // onPathSelect is stable for the life of the parent; re-running on it would re-fire the reveal.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recommended, reduceMotion]);
 
-  // Trolley position along the selected path
-  const getTrolleyPosition = () => {
-    if (!selectedPath) return { x: 0, y: 0 };
-    switch (selectedPath) {
-      case 'pull': return { x: 340, y: -80 };
-      case 'dont-pull': return { x: 380, y: 0 };
-      case 'safeguards': return { x: 340, y: 80 };
-      default: return { x: 0, y: 0 };
-    }
-  };
+  const choose = (p: PathId) => { setReading(p); onPathSelect(p); };
 
-  const pathConfigs = [
-    {
-      id: 'pull' as const,
-      label: 'Implement AI',
-      sublabel: 'Pull the Lever',
-      color: '#16A34A',
-      trackD1: 'M 220 185 C 300 175 380 140 520 110',
-      trackD2: 'M 220 195 C 300 185 380 150 520 120',
-      endX: 530, endY: 100,
-    },
-    {
-      id: 'dont-pull' as const,
-      label: 'Status Quo',
-      sublabel: "Don't Pull",
-      color: '#2563EB',
-      trackD1: 'M 220 185 L 560 185',
-      trackD2: 'M 220 195 L 560 195',
-      endX: 570, endY: 177,
-    },
-    {
-      id: 'safeguards' as const,
-      label: 'With Safeguards',
-      sublabel: 'Pull with Care',
-      color: '#D97706',
-      trackD1: 'M 220 185 C 300 195 380 230 520 260',
-      trackD2: 'M 220 195 C 300 205 380 240 520 270',
-      endX: 530, endY: 252,
-    },
-  ];
-
-  const trolleyPos = getTrolleyPosition();
+  const recRoad = recommended ? ROADS.find(r => r.id === recommended)! : null;
+  const trolleyTarget = recRoad ? { x: 560 - 90, y: recRoad.y - 160 } : { x: 0, y: 0 };
+  const occupiedLabels = concerns.length ? concerns : ['demand rising, capacity not', 'staff using unapproved tools', 'no policy in place'];
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      {/* Scene */}
-      <div className="relative rounded-2xl overflow-hidden bg-gradient-to-b from-background-alt to-background border border-rail-light">
-        <svg
-          viewBox="0 0 700 350"
-          className="w-full h-auto"
-          role="img"
-          aria-label="Trolley decision visualization showing three paths"
-        >
-          {/* Subtle grid/crosshatch pattern */}
-          <defs>
-            <pattern id="sleepers" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-              <rect x="9" y="0" width="2" height="20" fill="rgba(168,162,158,0.08)" />
-            </pattern>
-          </defs>
-          <rect width="700" height="350" fill="url(#sleepers)" />
-
-          {/* Main track (approach) */}
-          <line x1="30" y1="185" x2="220" y2="185" stroke="#A8A29E" strokeWidth="3" />
-          <line x1="30" y1="195" x2="220" y2="195" stroke="#A8A29E" strokeWidth="3" />
-          {/* Sleeper ties on main track */}
-          {Array.from({ length: 10 }).map((_, i) => (
-            <rect key={i} x={40 + i * 18} y="180" width="3" height="20" rx="1" fill="rgba(168,162,158,0.3)" />
+    <div className="w-full">
+      <div ref={scroller} className="diagram-scroll border-2 border-ink bg-paper-light overflow-x-auto">
+        <svg viewBox="0 0 800 250" className="w-full h-auto block min-w-[620px]" role="img"
+          aria-label={`Track diagram. One line reaches a facing point and splits into three roads: pull the lever, pull with care, and don't pull. ${recRoad ? `The recommended road, ${recRoad.label}, is lit green and the trolley has taken it.` : ''} The don't-pull road is already occupied by: ${occupiedLabels.join(', ')}.`}>
+          {Array.from({ length: 9 }).map((_, i) => (
+            <rect key={i} x={40 + i * 24} y={154} width="2" height="12" fill="#6F6B60" opacity="0.5" />
           ))}
+          <line x1="30" y1="160" x2="260" y2="160" stroke="#14202B" strokeWidth="2.5" />
+          <text x="34" y="184" fontFamily="IBM Plex Sans Condensed, Arial Narrow, sans-serif" fontSize="11" fill="#3E4A55" letterSpacing="1">YOUR ORGANISATION · APPROACH</text>
 
-          {/* Fork/switch point */}
-          <circle cx="220" cy="190" r="6" fill="#1B4D3E" />
-          <circle cx="220" cy="190" r="3" fill="#2A7A5E" />
+          <rect x="255" y="155" width="10" height="10" fill="#14202B" />
+          <text x="248" y="218" fontFamily="IBM Plex Sans Condensed, Arial Narrow, sans-serif" fontSize="11" fill="#3E4A55" letterSpacing="1">FACING POINT · THE DECISION</text>
 
-          {/* Three diverging tracks */}
-          {pathConfigs.map((path) => {
-            const isSelected = selectedPath === path.id;
-            const opacity = selectedPath ? (isSelected ? 1 : 0.3) : 0.7;
-
+          {ROADS.map((r) => {
+            const isRec = recommended === r.id;
+            const isReading = reading === r.id;
+            const isOccupied = r.id === 'dont-pull';
             return (
-              <g key={path.id}>
-                <motion.path
-                  d={path.trackD1}
-                  stroke={path.color}
-                  strokeWidth={isSelected ? 3.5 : 2.5}
-                  fill="none"
-                  initial={{ opacity: 0.4 }}
-                  animate={{ opacity }}
-                  transition={{ duration: 0.5 }}
-                />
-                <motion.path
-                  d={path.trackD2}
-                  stroke={path.color}
-                  strokeWidth={isSelected ? 3.5 : 2.5}
-                  fill="none"
-                  initial={{ opacity: 0.4 }}
-                  animate={{ opacity }}
-                  transition={{ duration: 0.5 }}
-                />
-
-                {/* Path label at end */}
-                <motion.g
-                  animate={{ opacity: selectedPath ? (isSelected ? 1 : 0.3) : 0.8 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  <rect
-                    x={path.endX}
-                    y={path.endY}
-                    width="130"
-                    height="32"
-                    rx="8"
-                    fill={path.color}
-                    fillOpacity={isSelected ? 0.15 : 0.08}
-                    stroke={path.color}
-                    strokeWidth={isSelected ? 1.5 : 0.5}
-                    strokeOpacity={isSelected ? 0.5 : 0.2}
-                  />
-                  <text
-                    x={path.endX + 65}
-                    y={path.endY + 20}
-                    textAnchor="middle"
-                    fill={path.color}
-                    fontSize="12"
-                    fontWeight="600"
-                    fontFamily="Source Sans 3, system-ui, sans-serif"
-                  >
-                    {path.label}
-                  </text>
-                </motion.g>
+              <g key={r.id}>
+                <path d={r.d} stroke="#14202B" strokeWidth={isReading ? 3.5 : 2} fill="none" />
+                {r.lampXs.map((x, i) => {
+                  const lit = isRec ? i < litCount : false;
+                  const fill = isOccupied ? '#B3261E' : lit ? '#5E7A5A' : '#DCD9CF';
+                  return <rect key={x} x={x - 6} y={r.y - 6} width="12" height="12" fill={fill} stroke="#14202B" strokeWidth="1.25" />;
+                })}
+                <text x="648" y={r.y + 4} fontFamily="IBM Plex Sans Condensed, Arial Narrow, sans-serif" fontSize="12" fontWeight="600" fill="#14202B" letterSpacing="0.5">
+                  {r.label.toUpperCase()}
+                </text>
+                {isRec && (
+                  <text x="648" y={r.y - 11} fontFamily="IBM Plex Sans Condensed, Arial Narrow, sans-serif" fontSize="10" fill="#5E7A5A" letterSpacing="1">LINE CLEAR · RECOMMENDED</text>
+                )}
+                {isReading && !isRec && (
+                  <text x="648" y={r.y - 11} fontFamily="IBM Plex Sans Condensed, Arial Narrow, sans-serif" fontSize="10" fill="#14202B" letterSpacing="1">READING THIS ROAD</text>
+                )}
               </g>
             );
           })}
 
-          {/* The Trolley */}
+          <text x="330" y="182" fontFamily="IBM Plex Mono, ui-monospace, monospace" fontSize="10" fill="#B3261E">
+            <tspan x="330" dy="0">occupied · {occupiedLabels.slice(0, 2).join(' · ')}</tspan>
+            {occupiedLabels[2] && <tspan x="330" dy="12">· {occupiedLabels[2]}</tspan>}
+          </text>
+
+          {/* The trolley: a plain rectangle marked YOU. It takes the recommended road. */}
           <motion.g
-            initial={{ x: 0, y: 0 }}
-            animate={{
-              x: trolleyPos.x,
-              y: trolleyPos.y,
-            }}
-            transition={{
-              duration: selectedPath ? 2.2 : 0,
-              ease: [0.25, 0.46, 0.45, 0.94],
-            }}
-            onAnimationComplete={() => {
-              if (selectedPath) setAnimationComplete(true);
-            }}
+            initial={false}
+            animate={{ x: trolleyTarget.x, y: trolleyTarget.y }}
+            transition={reduceMotion ? { duration: 0 } : { duration: 1.6, ease: [0.4, 0, 0.2, 1] }}
           >
-            {/* Trolley body */}
-            <rect x="55" y="170" width="50" height="28" rx="6" fill="#1B4D3E" />
-            {/* Trolley cabin */}
-            <rect x="62" y="160" width="36" height="18" rx="4" fill="#2A7A5E" />
-            {/* Window */}
-            <rect x="68" y="163" width="10" height="8" rx="2" fill="rgba(255,255,255,0.3)" />
-            <rect x="82" y="163" width="10" height="8" rx="2" fill="rgba(255,255,255,0.3)" />
-            {/* Wheels */}
-            <circle cx="70" cy="202" r="6" fill="#57534E" />
-            <circle cx="70" cy="202" r="3" fill="#78716C" />
-            <circle cx="90" cy="202" r="6" fill="#57534E" />
-            <circle cx="90" cy="202" r="3" fill="#78716C" />
+            <rect x="96" y="147" width="46" height="18" fill="#14202B" />
+            <text x="119" y="160" textAnchor="middle" fontFamily="IBM Plex Sans Condensed, Arial Narrow, sans-serif" fontSize="10" fontWeight="600" fill="#E6E4DC" letterSpacing="1">YOU</text>
           </motion.g>
 
-          {/* Decision label */}
-          {!selectedPath && (
-            <motion.text
-              x="80"
-              y="150"
-              textAnchor="middle"
-              fill="#1B4D3E"
-              fontSize="13"
-              fontWeight="600"
-              fontFamily="Source Sans 3, system-ui, sans-serif"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
-              Your Decision
-            </motion.text>
-          )}
+          <text x="30" y="236" fontFamily="IBM Plex Sans Condensed, Arial Narrow, sans-serif" fontSize="10" fill="#3E4A55" letterSpacing="1">
+            RED LAMP: SECTION OCCUPIED · GREEN LAMP: LINE CLEAR · GREY: UNLIT · THICK LINE: THE ROAD YOU ARE READING
+          </text>
         </svg>
       </div>
+      <p className="mt-1 font-mono text-[11px] text-ink-soft sm:hidden">← Swipe left for where the line comes in. The diagram is wider than the screen.</p>
 
-      {/* Path selection cards (accessible, mobile-friendly) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
-        {pathConfigs.map((path) => {
-          const isSelected = selectedPath === path.id;
+      {/* The three roads as choices: a lamp-coloured rule per road, the one being read in ink. */}
+      <div className="mt-3 grid sm:grid-cols-3 gap-2" role="group" aria-label="Choose a road to read its analysis">
+        {ROADS.map((r) => {
+          const isReading = reading === r.id;
+          const isRec = recommended === r.id;
           return (
-            <motion.button
-              key={path.id}
-              onClick={() => handlePathClick(path.id)}
-              className={`
-                relative p-4 rounded-xl border-2 text-left transition-all duration-300
-                ${isSelected
-                  ? 'border-current shadow-lg'
-                  : 'border-rail-light hover:border-current hover:shadow-md'
-                }
-              `}
-              style={{
-                color: path.color,
-                backgroundColor: isSelected ? `${path.color}10` : 'white',
-              }}
-              whileHover={{ y: -2 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: path.color }}
-                />
-                <span className="font-bold text-sm" style={{ color: path.color }}>
-                  {path.label}
-                </span>
-              </div>
-              <p className="text-xs text-text-muted">{path.sublabel}</p>
-              {isSelected && (
-                <motion.div
-                  className="absolute top-2 right-2"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: 'spring' }}
-                >
-                  <svg className="w-5 h-5" fill={path.color} viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
-                </motion.div>
-              )}
-            </motion.button>
+            <button key={r.id} type="button" onClick={() => choose(r.id)} aria-pressed={isReading}
+              style={{ borderLeftColor: LAMP_COLOR[r.id] }}
+              className={`text-left border-l-8 border-y border-r border-y-rule border-r-rule px-3 py-2.5 transition-colors ${isReading ? 'bg-ink text-paper' : 'bg-transparent text-ink hover:bg-paper-deep'}`}>
+              <span className="block font-display font-semibold uppercase tracking-[0.06em] text-[13px]">
+                {r.label}{isRec ? ' · recommended' : ''}
+              </span>
+              <span className={`block text-[13px] mt-0.5 ${isReading ? 'text-paper' : 'text-ink-soft'}`}>{r.plain}</span>
+            </button>
           );
         })}
       </div>

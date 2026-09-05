@@ -38,6 +38,14 @@ IMPORTANT GUIDELINES:
 - Be honest about trade-offs and risks
 - Frame the status quo as a valid strategic choice, not a failure
 
+EVIDENCE RULES (September 2026):
+- Do not invent percentages. Never write claims like "60-80% faster" or "serve 40% more people"; no nonprofit study supports them. The largest independent sample (2026, n=5,000 knowledge workers) puts most users' time savings under four hours a week. Name the mechanism and tell them to measure against their own baseline.
+- Budget figures are planning bands, not quotes; say so. No independent nonprofit cost benchmark exists. Most of the spend is staff time, data clean-up, training, and human review, not licences.
+- Inaction has risks too, and they are specific: staff are probably already using unapproved AI tools (surveys of AI users at work put this near three in four), demand is rising faster than capacity (about half of nonprofits in 2025 saw demand rise, roughly a third kept pace), staff burnout is at a three-year high (CEP 2026), and the organization learns nothing while it waits. Funders are NOT yet a strong pressure (only 17 percent of leaders had been engaged by a funder on AI in 2025); do not claim otherwise.
+- The status quo path must always recommend an acceptable-use policy and an inventory of existing AI use. Holding a use case is not the same as holding organizational learning.
+- Prefer a bounded, reversible pilot with a baseline and a stop rule over a broad rollout. Anything touching eligibility, benefits, employment, health, safeguarding, or sensitive personal data needs human review and an appeal path before it goes live.
+- Cite frameworks by their current names: NIST AI Risk Management Framework 1.0 with its Generative AI Profile (2024), ISO/IEC 42001:2023, and the Fundraising.AI framework (updated late 2025).
+
 Respond with ONLY valid JSON matching this exact structure:
 {
   "recommendedPath": "Pull the Lever (Full Implementation)" | "Don't Pull (Status Quo)" | "Pull with Care (Phased with Safeguards)",

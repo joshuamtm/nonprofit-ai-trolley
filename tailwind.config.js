@@ -1,77 +1,40 @@
 /** @type {import('tailwindcss').Config} */
+// Visual system: "Section Occupied" (a signal box track-circuit diagram, redrawn as a printed
+// working document). Chosen 2026-09-05 via MTM Wild Mode; see
+// ~/.claude/skills/CORE/references/reference_design_modes.md
 module.exports = {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        // Core palette — warm charcoal + cream foundation
-        primary: '#1B4D3E',        // Deep forest/signal green
-        'primary-light': '#2A7A5E', // Lighter green for hover
-        'primary-dark': '#143A2F',  // Darker green for active
-        secondary: '#C4572A',       // Warm terracotta/signal
-        background: '#FAF7F2',      // Warm cream
-        'background-alt': '#F0EBE3', // Slightly deeper cream
-        textDark: '#1C1917',        // Warm near-black
-        'text-muted': '#78716C',    // Stone muted text
-
-        // Signal colors for the three paths
-        'signal-green': '#16A34A',  // Path 1: Implement
-        'signal-blue': '#2563EB',   // Path 2: Status Quo
-        'signal-amber': '#D97706',  // Path 3: With Safeguards
-
-        // Track/rail accent
-        'rail': '#A8A29E',          // Stone/steel gray
-        'rail-dark': '#57534E',     // Dark rail
-        'rail-light': '#D6D3D1',    // Light rail/sleeper
-
-        // Surface colors
-        'surface': '#FFFFFF',
-        'surface-warm': '#FEFDFB',
-        'surface-elevated': '#FFFFFF',
+        paper: '#E6E4DC',        // grey panel paper
+        'paper-deep': '#DCD9CF', // a shade down: carbon strip, unlit lamps
+        'paper-light': '#EFEDE6',
+        ink: '#14202B',          // blue-black ink (also the carbon)
+        'ink-soft': '#3E4A55',   // secondary text, AA on paper
+        signal: '#B3261E',       // occupied / chosen lamp, warnings; fills and large text only
+        sage: '#5E7A5A',         // line clear; fills only, never small text
+        rule: '#6F6B60',         // hairlines
+        // Legacy aliases still referenced in a few places; mapped onto the system.
+        primary: '#14202B',
+        secondary: '#B3261E',
+        background: '#E6E4DC',
+        textDark: '#14202B',
+        'text-muted': '#3E4A55',
       },
       fontFamily: {
-        display: ['"DM Serif Display"', 'Georgia', 'serif'],
-        sans: ['"Source Sans 3"', 'system-ui', 'sans-serif'],
-        mono: ['"JetBrains Mono"', 'monospace'],
+        display: ['"IBM Plex Sans Condensed"', 'Arial Narrow', 'sans-serif'],
+        serif: ['Spectral', 'Georgia', 'serif'],
+        sans: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
+        mono: ['"IBM Plex Mono"', 'ui-monospace', 'monospace'],
       },
       fontSize: {
-        'hero': ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em' }],
-        'title': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
-        'subtitle': ['1.25rem', { lineHeight: '1.4' }],
+        'display': ['clamp(28px, 4.2vw, 46px)', { lineHeight: '1.05', letterSpacing: '0.005em' }],
+        'heading': ['clamp(22px, 2.4vw, 30px)', { lineHeight: '1.15' }],
+        'rubric': ['12px', { lineHeight: '1.2', letterSpacing: '0.12em' }],
       },
-      boxShadow: {
-        'card': '0 1px 3px rgba(28, 25, 23, 0.06), 0 4px 12px rgba(28, 25, 23, 0.04)',
-        'card-hover': '0 2px 8px rgba(28, 25, 23, 0.08), 0 8px 24px rgba(28, 25, 23, 0.06)',
-        'elevated': '0 4px 16px rgba(28, 25, 23, 0.08), 0 12px 32px rgba(28, 25, 23, 0.06)',
-      },
-      borderRadius: {
-        'xl': '1rem',
-        '2xl': '1.25rem',
-      },
-      animation: {
-        'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
-        'fade-in': 'fadeIn 0.6s ease-out',
-        'track-pulse': 'trackPulse 2s ease-in-out infinite',
-      },
-      keyframes: {
-        slideUp: {
-          '0%': { transform: 'translateY(16px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        trackPulse: {
-          '0%, 100%': { opacity: '0.4' },
-          '50%': { opacity: '0.8' },
-        },
-      },
+      maxWidth: { panel: '820px' },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-  ],
+  plugins: [require('@tailwindcss/forms')],
 }

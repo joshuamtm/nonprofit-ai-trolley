@@ -1,9 +1,6 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { CheckCircle, AlertCircle, Download } from 'lucide-react';
 import { SessionData, PathAnalysis } from '../types';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+import { roadName } from '../utils/roadNames';
 
 interface ComparisonViewProps {
   data: SessionData;
@@ -14,311 +11,75 @@ interface ComparisonViewProps {
   rationale: string;
 }
 
-const ComparisonView: React.FC<ComparisonViewProps> = ({
-  data,
-  pullLever,
-  dontPull,
-  withSafeguards,
-  recommendedPath,
-  rationale
-}) => {
-  const comparisonRef = React.useRef<HTMLDivElement>(null);
+// The three roads side by side, as a ruled register table.
+const ComparisonView: React.FC<ComparisonViewProps> = ({ data, pullLever, dontPull, withSafeguards, recommendedPath, rationale }) => {
+  const rec = (recommendedPath || '').toLowerCase();
+  const care = rec.includes('care') || rec.includes('safeguard') || rec.includes('phased');
+  const dont = rec.includes("don't") || rec.includes('status quo') || rec.includes('maintain');
+  const isRec = { pull: !care && !dont && (rec.includes('full') || rec.includes('pull') || rec.includes('implement')), dont, care };
 
-  const downloadComparison = async () => {
-    if (!comparisonRef.current) return;
-
-    try {
-      const canvas = await html2canvas(comparisonRef.current, {
-        scale: 2,
-        backgroundColor: '#ffffff',
-        logging: false
-      });
-
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a4'
-      });
-
-      const imgWidth = 297; // A4 landscape width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      pdf.save('ai-trolley-comparison.pdf');
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-    }
-  };
-
-  const getPathIcon = (path: string) => {
-    if (path === recommendedPath) {
-      return <CheckCircle className="w-6 h-6 text-green-500" />;
-    }
-    return <AlertCircle className="w-6 h-6 text-gray-400" />;
-  };
-
-  const getScoreColor = (score: number) => {
-    if (score >= 70) return 'text-green-600';
-    if (score >= 40) return 'text-yellow-600';
-    return 'text-red-600';
-  };
-
-  const criteria = [
-    'Impact Score',
-    'Implementation Speed',
-    'Risk Level',
-    'Cost',
-    'Stakeholder Buy-in',
-    'Ethical Alignment',
-    'Scalability',
-    'Learning Opportunity'
+  const rows: { label: string; pull: string; dont: string; care: string }[] = [
+    { label: 'Impact score (a quantity, not a verdict)', pull: `${pullLever.impactScore ?? '–'} / 100`, dont: `${dontPull.impactScore ?? '–'} / 100`, care: `${withSafeguards.impactScore ?? '–'} / 100` },
+    { label: 'Time to first result', pull: 'Fast, one to three months', dont: 'None; the wait itself', care: 'Moderate, three to six months' },
+    { label: 'Risk on the road', pull: 'High', dont: 'The risks already on the line', care: 'Moderate, with a person checking' },
+    { label: 'Cost, planning band', pull: pullLever.budgetEstimates?.total || 'High', dont: dontPull.budgetEstimates?.total || 'No AI spend, but not no cost', care: withSafeguards.budgetEstimates?.total || 'Moderate' },
+    { label: 'Stakeholders', pull: data.stakeholderReadiness === 'eager' ? 'Ready' : 'Needs winning over', dont: 'Comfortable, for now', care: 'Brought along in stages' },
+    { label: 'Ethics', pull: 'Needs vigilance from day one', dont: 'Unchanged, including the informal use', care: 'Safeguards built in' },
+    { label: 'What you learn', pull: 'Fast, sometimes the hard way', dont: 'Little', care: 'Steadily, at low stakes' },
   ];
 
-  const getComparisonData = (criterion: string) => {
-    const comparisonMap: { [key: string]: { pullLever: any; dontPull: any; withSafeguards: any } } = {
-      'Impact Score': {
-        pullLever: pullLever.impactScore || 85,
-        dontPull: dontPull.impactScore || 20,
-        withSafeguards: withSafeguards.impactScore || 65
-      },
-      'Implementation Speed': {
-        pullLever: 'Fast (1-3 months)',
-        dontPull: 'N/A',
-        withSafeguards: 'Moderate (3-6 months)'
-      },
-      'Risk Level': {
-        pullLever: 'High',
-        dontPull: 'Low',
-        withSafeguards: 'Moderate'
-      },
-      'Cost': {
-        pullLever: pullLever.budgetEstimates?.total || 'High',
-        dontPull: dontPull.budgetEstimates?.total || 'None',
-        withSafeguards: withSafeguards.budgetEstimates?.total || 'Moderate'
-      },
-      'Stakeholder Buy-in': {
-        pullLever: data.stakeholderReadiness === 'enthusiastic' ? 'High' : 'Challenging',
-        dontPull: 'Maintained',
-        withSafeguards: 'Gradual Build'
-      },
-      'Ethical Alignment': {
-        pullLever: 'Requires Vigilance',
-        dontPull: 'Status Quo',
-        withSafeguards: 'Built-in Safeguards'
-      },
-      'Scalability': {
-        pullLever: 'High',
-        dontPull: 'Limited',
-        withSafeguards: 'Phased Growth'
-      },
-      'Learning Opportunity': {
-        pullLever: 'Rapid Learning',
-        dontPull: 'Minimal',
-        withSafeguards: 'Structured Learning'
-      }
-    };
-
-    return comparisonMap[criterion] || { pullLever: '-', dontPull: '-', withSafeguards: '-' };
-  };
+  const cols = [
+    { key: 'pull', title: 'Pull the lever', sub: 'adopt now', rec: isRec.pull, a: pullLever },
+    { key: 'dont', title: "Don't pull", sub: 'hold the status quo', rec: isRec.dont, a: dontPull },
+    { key: 'care', title: 'Pull with care', sub: 'adopt in stages', rec: isRec.care, a: withSafeguards },
+  ] as const;
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="mb-6 flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-primary">Path Comparison Analysis</h2>
-        <button
-          onClick={downloadComparison}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
-        >
-          <Download className="w-5 h-5" />
-          Download Comparison
-        </button>
+    <div>
+      <p className="rubric">Section 5 of 5 · the roads compared</p>
+      <h2 className="font-display font-semibold text-heading uppercase mt-1">Three roads, side by side</h2>
+      <p className="font-serif text-[16.5px] mt-2 max-w-[60ch]"><span className="font-semibold">Line taken: {roadName(recommendedPath)}.</span> {rationale}</p>
+
+      <div className="mt-5 overflow-x-auto">
+        <table className="ledger min-w-[640px]">
+          <thead>
+            <tr>
+              <th className="w-[28%]">Measure</th>
+              {cols.map(c => (
+                <th key={c.key} className="w-[24%]">
+                  {c.title}{c.rec && <span className="block font-display text-[10px] tracking-[0.1em] text-signal">Recommended</span>}
+                  <span className="block font-sans font-normal normal-case tracking-normal text-[12px] text-ink-soft">{c.sub}</span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(r => (
+              <tr key={r.label}>
+                <td className="text-ink-soft">{r.label}</td>
+                <td className={isRec.pull ? 'font-medium' : ''}>{r.pull}</td>
+                <td className={isRec.dont ? 'font-medium' : ''}>{r.dont}</td>
+                <td className={isRec.care ? 'font-medium' : ''}>{r.care}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      <div ref={comparisonRef} className="bg-white rounded-lg shadow-lg p-6">
-        {/* Recommendation Banner */}
-        <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-          <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="w-6 h-6 text-blue-500" />
-            <h3 className="text-lg font-semibold">Recommended Path: {recommendedPath}</h3>
+      <div className="rule-top mt-8 pt-5 grid md:grid-cols-3 gap-x-8 gap-y-6">
+        {cols.map(c => (
+          <div key={c.key}>
+            <p className="font-display font-semibold uppercase text-[14px] tracking-[0.06em] border-b border-ink pb-1">{c.title}{c.rec ? ' · recommended' : ''}</p>
+            <p className="rubric mt-3 mb-1">Gain</p>
+            <ul className="text-[14.5px] space-y-1">
+              {c.a.tradeOffSummary?.gains.slice(0, 3).map((g, i) => <li key={i} className="flex gap-2"><span className="mt-2 h-2 w-2 bg-sage flex-shrink-0" aria-hidden="true" />{g}</li>)}
+            </ul>
+            <p className="rubric mt-3 mb-1">{c.key === 'dont' ? 'Already on the line' : 'Risk'}</p>
+            <ul className="text-[14.5px] space-y-1">
+              {c.a.tradeOffSummary?.losses.slice(0, 3).map((l, i) => <li key={i} className="flex gap-2"><span className="mt-2 h-2 w-2 bg-signal flex-shrink-0" aria-hidden="true" />{l}</li>)}
+            </ul>
           </div>
-          <p className="text-gray-700">{rationale}</p>
-        </div>
-
-        {/* Comparison Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="border-b-2 border-gray-300">
-                <th className="text-left p-3 font-semibold">Criteria</th>
-                <th className="text-center p-3">
-                  <div className="flex items-center justify-center gap-2">
-                    {getPathIcon('Path 1: Pull the Lever (Full AI Implementation)')}
-                    <span className="font-semibold">Pull Lever</span>
-                  </div>
-                </th>
-                <th className="text-center p-3">
-                  <div className="flex items-center justify-center gap-2">
-                    {getPathIcon('Path 2: Don\'t Pull (Maintain Status Quo)')}
-                    <span className="font-semibold">Don't Pull</span>
-                  </div>
-                </th>
-                <th className="text-center p-3">
-                  <div className="flex items-center justify-center gap-2">
-                    {getPathIcon('Path 3: Pull with Care (Phased Implementation with Safeguards)')}
-                    <span className="font-semibold">With Safeguards</span>
-                  </div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {criteria.map((criterion, index) => {
-                const rowData = getComparisonData(criterion);
-                return (
-                  <tr key={criterion} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                    <td className="p-3 font-medium">{criterion}</td>
-                    <td className={`p-3 text-center ${criterion === 'Impact Score' ? getScoreColor(rowData.pullLever) : ''}`}>
-                      {typeof rowData.pullLever === 'number' ? `${rowData.pullLever}/100` : rowData.pullLever}
-                    </td>
-                    <td className={`p-3 text-center ${criterion === 'Impact Score' ? getScoreColor(rowData.dontPull) : ''}`}>
-                      {typeof rowData.dontPull === 'number' ? `${rowData.dontPull}/100` : rowData.dontPull}
-                    </td>
-                    <td className={`p-3 text-center ${criterion === 'Impact Score' ? getScoreColor(rowData.withSafeguards) : ''}`}>
-                      {typeof rowData.withSafeguards === 'number' ? `${rowData.withSafeguards}/100` : rowData.withSafeguards}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Key Trade-offs */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className={`p-4 rounded-lg border-2 ${
-              recommendedPath.includes('Full') ? 'border-green-500 bg-green-50' : 'border-gray-300'
-            }`}
-          >
-            <h4 className="font-semibold mb-2">Pull Lever - Key Trade-offs</h4>
-            <div className="space-y-2">
-              <div>
-                <span className="text-sm font-medium text-green-600">Gains:</span>
-                <ul className="text-sm text-gray-600 ml-4">
-                  {pullLever.tradeOffSummary?.gains.slice(0, 3).map((gain, i) => (
-                    <li key={i}>• {gain}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-red-600">Losses:</span>
-                <ul className="text-sm text-gray-600 ml-4">
-                  {pullLever.tradeOffSummary?.losses.slice(0, 3).map((loss, i) => (
-                    <li key={i}>• {loss}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className={`p-4 rounded-lg border-2 ${
-              recommendedPath.includes('Status Quo') ? 'border-green-500 bg-green-50' : 'border-gray-300'
-            }`}
-          >
-            <h4 className="font-semibold mb-2">Don't Pull - Key Trade-offs</h4>
-            <div className="space-y-2">
-              <div>
-                <span className="text-sm font-medium text-green-600">Gains:</span>
-                <ul className="text-sm text-gray-600 ml-4">
-                  {dontPull.tradeOffSummary?.gains.slice(0, 3).map((gain, i) => (
-                    <li key={i}>• {gain}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-red-600">Losses:</span>
-                <ul className="text-sm text-gray-600 ml-4">
-                  {dontPull.tradeOffSummary?.losses.slice(0, 3).map((loss, i) => (
-                    <li key={i}>• {loss}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className={`p-4 rounded-lg border-2 ${
-              recommendedPath.includes('Safeguards') ? 'border-green-500 bg-green-50' : 'border-gray-300'
-            }`}
-          >
-            <h4 className="font-semibold mb-2">With Safeguards - Key Trade-offs</h4>
-            <div className="space-y-2">
-              <div>
-                <span className="text-sm font-medium text-green-600">Gains:</span>
-                <ul className="text-sm text-gray-600 ml-4">
-                  {withSafeguards.tradeOffSummary?.gains.slice(0, 3).map((gain, i) => (
-                    <li key={i}>• {gain}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <span className="text-sm font-medium text-red-600">Losses:</span>
-                <ul className="text-sm text-gray-600 ml-4">
-                  {withSafeguards.tradeOffSummary?.losses.slice(0, 3).map((loss, i) => (
-                    <li key={i}>• {loss}</li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Quick Action Items */}
-        <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold mb-3">Immediate Next Steps (Based on Recommended Path)</h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <span className="text-sm font-medium text-primary">30 Days:</span>
-              <ul className="text-sm text-gray-600 mt-1">
-                {(recommendedPath.includes('Full') ? pullLever.actionPlan30Days :
-                  recommendedPath.includes('Status Quo') ? dontPull.actionPlan30Days :
-                  withSafeguards.actionPlan30Days)?.slice(0, 3).map((action, i) => (
-                  <li key={i}>• {action}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-primary">60 Days:</span>
-              <ul className="text-sm text-gray-600 mt-1">
-                {(recommendedPath.includes('Full') ? pullLever.actionPlan60Days :
-                  recommendedPath.includes('Status Quo') ? dontPull.actionPlan60Days :
-                  withSafeguards.actionPlan60Days)?.slice(0, 3).map((action, i) => (
-                  <li key={i}>• {action}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-primary">90 Days:</span>
-              <ul className="text-sm text-gray-600 mt-1">
-                {(recommendedPath.includes('Full') ? pullLever.actionPlan90Days :
-                  recommendedPath.includes('Status Quo') ? dontPull.actionPlan90Days :
-                  withSafeguards.actionPlan90Days)?.slice(0, 3).map((action, i) => (
-                  <li key={i}>• {action}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

@@ -1,225 +1,96 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import React from 'react';
+import SectionStrip from './SectionStrip';
 
 interface WelcomeSectionProps {
   onGetStarted: () => void;
 }
 
 const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onGetStarted }) => {
-  const [showMore, setShowMore] = useState(false);
-
-  const stagger = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.12, delayChildren: 0.1 },
-    },
-  };
-
-  const fadeUp = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-  };
-
   return (
-    <motion.div
-      variants={stagger}
-      initial="hidden"
-      animate="show"
-      className="max-w-3xl mx-auto"
-    >
-      {/* Hero */}
-      <motion.div variants={fadeUp} className="text-center mb-12">
-        {/* Trolley icon */}
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-6">
-          <svg className="w-8 h-8 text-primary" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <rect x="6" y="10" width="20" height="12" rx="3" />
-            <rect x="10" y="6" width="12" height="8" rx="2" />
-            <circle cx="11" cy="26" r="2.5" />
-            <circle cx="21" cy="26" r="2.5" />
-            <line x1="2" y1="28" x2="30" y2="28" strokeWidth="1.5" opacity="0.4" />
-          </svg>
-        </div>
-
-        <h1 className="font-display text-hero text-textDark mb-4">
-          The Nonprofit<br />AI Trolley Problem
+    <div>
+      {/* Hero: the job, then the one action, in the first viewport. */}
+      <section className="mt-6 md:mt-10">
+        <p className="rubric">Working diagram · not to scale · 5 sections · about 5 minutes</p>
+        <h1 className="font-display font-bold text-display uppercase mt-2 max-w-[24ch]">
+          <span className="sm:hidden">Act on AI, hold, or act with safeguards. Take the answer to your board.</span>
+          <span className="hidden sm:inline">Work out whether to act on AI, hold, or act with safeguards, and take the answer to your board.</span>
         </h1>
-        <p className="text-subtitle text-text-muted max-w-xl mx-auto leading-relaxed">
-          A guided ethical framework to help your organization make informed
-          decisions about AI adoption — aligned with your mission, values, and capacity.
+        <p className="font-serif text-[18px] sm:text-[19px] leading-relaxed mt-4 max-w-[58ch]">
+          <span className="sm:hidden">Five short sections. At the end, three paths with real trade-offs, a recommendation, and a report your board can read.</span>
+          <span className="hidden sm:inline">Five short sections about your organisation, the AI initiative you are weighing, what worries you, and how ready you are. At the end, three paths with real trade-offs, a recommendation, and a report your board can read.</span>
+          <span className="italic"> Holding still is one of the three paths, and it has costs too.</span>
         </p>
-      </motion.div>
+        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
+          <button type="button" onClick={onGetStarted} className="btn-panel px-7 py-3.5 text-[16px]">
+            Begin, section 1
+          </button>
+          <span className="font-mono text-[12.5px] text-ink-soft">No sign-up · your answers stay in your browser · free</span>
+        </div>
+      </section>
 
-      {/* Journey overview */}
-      <motion.div variants={fadeUp} className="card mb-6">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/8 rounded-lg">
-            <Clock className="w-4 h-4 text-primary" />
-            <span className="text-sm font-semibold text-primary">5 minutes</span>
+      {/* The line ahead */}
+      <section className="rule-top mt-8 pt-4">
+        <p className="rubric mb-3">The line ahead · five sections</p>
+        <SectionStrip currentStep={0} />
+      </section>
+
+      {/* Why inaction has risks: the evidence, briefly */}
+      <section className="rule-top mt-8 pt-5 grid md:grid-cols-[1fr_1fr] gap-x-10 gap-y-6">
+        <div>
+          <h2 className="font-display font-semibold text-heading uppercase">Why "the trolley problem"</h2>
+          <div className="font-serif text-[17px] leading-relaxed mt-3 prose-panel">
+            <p>A runaway trolley is heading for five people. You can pull a lever and send it down another track, where it will hit one. Do you pull?</p>
+            <p>AI adoption has the same shape. Implementing it might help you serve many more people, and it might introduce bias, privacy exposure, or wrong answers reaching someone who trusted you. Not pulling the lever is also a choice, and the trolley keeps moving.</p>
           </div>
-          <span className="text-sm text-text-muted">to complete</span>
         </div>
-
-        <div className="space-y-0">
-          {[
-            { step: 1, title: 'Your Organization', desc: 'Type, size, and mission', time: '1 min' },
-            { step: 2, title: 'The AI Initiative', desc: 'What you\'re considering and why', time: '1 min' },
-            { step: 3, title: 'Your Concerns', desc: 'Rate ethical and practical worries', time: '1 min' },
-            { step: 4, title: 'Readiness Assessment', desc: 'Organizational capacity and urgency', time: '1 min' },
-            { step: 5, title: 'Your Analysis', desc: 'Personalized three-path recommendation', time: '1 min' },
-          ].map((item, i) => (
-            <div key={item.step} className="flex items-start gap-4 py-3">
-              {/* Track connector */}
-              <div className="flex flex-col items-center">
-                <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary border border-primary/20">
-                  {item.step}
-                </div>
-                {i < 4 && <div className="w-px h-6 bg-rail-light mt-1" />}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-textDark text-sm">{item.title}</p>
-                <p className="text-xs text-text-muted">{item.desc}</p>
-              </div>
-            </div>
-          ))}
+        <div>
+          <h2 className="font-display font-semibold text-heading uppercase">What standing still costs</h2>
+          <ul className="mt-3 space-y-2.5 text-[15.5px] leading-relaxed">
+            <li className="flex gap-3"><span className="mt-2 h-2.5 w-2.5 bg-signal flex-shrink-0" aria-hidden="true" /><span>Staff are probably already using AI. Among people who use AI at work, about three in four use tools their employer has not approved.<sup className="font-mono text-[11px] text-signal ml-0.5">1</sup></span></li>
+            <li className="flex gap-3"><span className="mt-2 h-2.5 w-2.5 bg-signal flex-shrink-0" aria-hidden="true" /><span>Demand is rising faster than capacity: in 2025 about half of nonprofits saw demand grow, and roughly a third kept pace.<sup className="font-mono text-[11px] text-signal ml-0.5">2</sup></span></li>
+            <li className="flex gap-3"><span className="mt-2 h-2.5 w-2.5 bg-signal flex-shrink-0" aria-hidden="true" /><span>Most nonprofits use AI, few have decided how: 92 percent report some use, 47 percent have no policy, 7 percent see major gains.<sup className="font-mono text-[11px] text-signal ml-0.5">3</sup></span></li>
+            <li className="flex gap-3"><span className="mt-2 h-2.5 w-2.5 bg-sage flex-shrink-0" aria-hidden="true" /><span>Funders are not yet pushing: only 17 percent of leaders had been asked about AI by a funder.<sup className="font-mono text-[11px] text-signal ml-0.5">4</sup> That pressure arrives later, and faster.</span></li>
+          </ul>
+          <p className="mt-3 font-mono text-[12px] text-ink-soft">Sources on the <a href="/methodology" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-ink hover:text-signal">method page</a>.</p>
         </div>
-      </motion.div>
+      </section>
 
-      {/* What you'll receive */}
-      <motion.div variants={fadeUp} className="card mb-6">
-        <h3 className="font-display text-lg text-textDark mb-4">What You'll Receive</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {[
-            'Personalized recommendation based on your specific situation',
-            'Three detailed paths with clear trade-offs',
-            'Actionable 30/60/90 day roadmap',
-            'Downloadable PDF report for your board',
-          ].map((item, i) => (
-            <div key={i} className="flex items-start gap-2.5">
-              <div className="w-5 h-5 rounded-full bg-signal-green/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg className="w-3 h-3 text-signal-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <span className="text-sm text-textDark">{item}</span>
-            </div>
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Cat Trolley Video — Answer in Progress */}
-      <motion.div variants={fadeUp} className="card mb-6">
-        <h3 className="font-display text-lg text-textDark mb-2">
-          The Trolley Problem, Explained (with Cats)
-        </h3>
-        <p className="text-sm text-text-muted mb-4">
-          This delightful ~2-minute video explains both the trolley problem <em>and</em> the
-          AI alignment challenge at the heart of this tool.
-        </p>
-        <div className="aspect-video w-full rounded-lg overflow-hidden bg-background-alt">
+      {/* The briefing film */}
+      <section className="rule-top mt-8 pt-5">
+        <p className="rubric">Briefing film · 2 minutes · not required</p>
+        <h2 className="font-display font-semibold text-heading uppercase mt-1">The trolley problem, explained with cats</h2>
+        <p className="font-serif text-[16px] mt-2 max-w-[60ch]">Two minutes on the thought experiment and the AI alignment question underneath it. Watch it, or go straight to section 1.</p>
+        <div className="mt-4 border-2 border-ink bg-paper-deep aspect-video max-w-2xl">
           <iframe
             className="w-full h-full"
             src="https://www.youtube.com/embed/x9SyL_B_xbY"
-            title="Cat Trolley Problem — Answer in Progress"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            title="Cat Trolley Problem, by Answer in Progress"
+            loading="lazy"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
           />
         </div>
-        <p className="mt-3 text-xs text-text-muted">
-          Video by the wonderful{' '}
-          <a
-            href="https://www.youtube.com/@answerinprogress"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline font-semibold"
-          >
-            Answer in Progress
-          </a>
-          . Watch the{' '}
-          <a
-            href="https://www.youtube.com/watch?v=181Nj060xMQ&t"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary hover:underline font-semibold"
-          >
-            full video here
-          </a>
-          .
+        <p className="mt-2 font-mono text-[12px] text-ink-soft">
+          Video by <a href="https://www.youtube.com/@answerinprogress" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-ink hover:text-signal">Answer in Progress</a>. <a href="https://www.youtube.com/watch?v=181Nj060xMQ&t" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 text-ink hover:text-signal">Full video</a>.
         </p>
-      </motion.div>
+      </section>
 
-      {/* Why the Trolley Problem — collapsible */}
-      <motion.div variants={fadeUp} className="card mb-8">
-        <button
-          onClick={() => setShowMore(!showMore)}
-          className="w-full flex items-center justify-between text-left group"
-        >
-          <h3 className="font-display text-lg text-textDark">
-            Why "The Trolley Problem"?
-          </h3>
-          <div className="w-8 h-8 rounded-lg bg-background-alt flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-            {showMore ? (
-              <ChevronUp className="w-4 h-4 text-text-muted" />
-            ) : (
-              <ChevronDown className="w-4 h-4 text-text-muted" />
-            )}
-          </div>
-        </button>
-
-        {showMore && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
-            className="mt-4 text-sm text-text-muted space-y-3 border-t border-rail-light pt-4"
-          >
-            <p>
-              The trolley problem is a famous thought experiment in ethics: A runaway trolley is heading toward
-              five people on the tracks. You can pull a lever to divert it to another track, where it will hit
-              only one person. What do you do?
-            </p>
-            <p>
-              <strong className="text-textDark">AI adoption presents a similar dilemma.</strong> Implementing AI might help you serve many more
-              beneficiaries, but it could introduce risks around bias, privacy, or loss of human
-              connection. There's no perfect answer — only trade-offs to consider carefully.
-            </p>
-            <p className="italic text-xs">
-              This tool helps you explore these ethical trade-offs in the context of your specific organization
-              and arrive at an informed decision aligned with your values.
-            </p>
-          </motion.div>
-        )}
-      </motion.div>
-
-      {/* CTA */}
-      <motion.div variants={fadeUp} className="text-center">
-        <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
-          <motion.button
-            onClick={onGetStarted}
-            className="btn-primary text-base px-10 py-4"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            Begin Your Assessment
-          </motion.button>
-
-          <a
-            href="/methodology"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-outline text-sm px-6 py-3"
-          >
-            View Methodology
-          </a>
+      {/* What you leave with, and the repeat action */}
+      <section className="rule-top mt-8 pt-5 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+        <div>
+          <h2 className="font-display font-semibold text-heading uppercase">What you leave with</h2>
+          <ul className="mt-2 font-serif text-[16.5px] leading-relaxed space-y-1">
+            <li>A recommendation for your situation, with the reasoning written out.</li>
+            <li>Three paths, each with what you gain and what you risk.</li>
+            <li>A 30, 60, 90 day plan for the recommended path.</li>
+            <li>A PDF for your board, generated in your browser, never uploaded.</li>
+          </ul>
         </div>
-
-        <p className="mt-4 text-xs text-text-muted">
-          No sign-up required &middot; Your data stays private &middot; Free to use
-        </p>
-      </motion.div>
-    </motion.div>
+        <button type="button" onClick={onGetStarted} className="btn-panel px-7 py-3.5 text-[16px] self-start md:self-end">
+          Begin, section 1
+        </button>
+      </section>
+    </div>
   );
 };
 

@@ -1,123 +1,74 @@
 # The Nonprofit AI Trolley Problem
 
-An interactive ethical framework tool to help nonprofits evaluate AI implementation decisions through a risk-benefit analysis.
+**Live:** https://nonprofit-ai-trolley.mtmapps.now/
 
-## Overview
+A free tool from [Meet the Moment](https://mtm.now) for nonprofit leaders, consultants and academics. Five short sections about your organisation, the AI initiative you are weighing, what worries you, and how ready you are. At the end: three roads with real trade-offs, a recommendation with the reasoning written out, and a PDF for your board.
 
-This application provides a structured, neutral framework for nonprofits to evaluate AI initiatives through guided questions, resulting in a clear three-path analysis with actionable insights. It's designed for use in human-centered AI courses and organizational decision-making processes.
+The point of the tool is the one the trolley problem makes: **not pulling the lever is also a choice, and the trolley keeps moving.** Holding the status quo has costs, and the tool names them for your situation.
 
-## Features
+## The three roads
 
-- **5-Minute Assessment**: Quick, guided questionnaire covering organizational context, AI initiatives, concerns, and readiness
-- **Interactive Trolley Animation**: Visual representation of three decision paths
-- **Comprehensive PDF Reports**: Downloadable analysis with benefits, risks, and mitigation strategies for each path
-- **Three-Path Framework**:
-  - Path 1: Implement AI (Pull the Lever)
-  - Path 2: Maintain Status Quo (Don't Pull)
-  - Path 3: Implement with Safeguards (Pull with Care)
+| Road | What it means |
+|---|---|
+| **Pull the lever** | Adopt AI now, across the initiative, accepting the risks for the fastest gain |
+| **Don't pull** | Hold the status quo. Drawn as an occupied section, labelled with the visitor's own top concerns |
+| **Pull with care** | Adopt in stages: a bounded pilot, a person checking, a baseline, and a stop rule |
 
-## Tech Stack
+## Design: "Section Occupied"
 
-- **Frontend**: React 18 with TypeScript
-- **Styling**: Tailwind CSS
-- **Animations**: Framer Motion
-- **Forms**: React Hook Form
-- **PDF Generation**: jsPDF
-- **Hosting**: Netlify
+The site is drawn as a signal-box track-circuit diagram redrawn as a printed working document. Grey panel paper, condensed capitals for rubrics, Spectral for the questions, mono for the register entries. The five sections light on the track strip as you pass through them. Concerns are rated on lamp rows. The analysis is a facing point: the recommended road lights sage and the trolley takes it; the "don't pull" road is lit red and labelled with what is already on it. A carbon-duplicate strip at the foot carries the answers into the PDF.
 
-## Getting Started
+The look came out of the Wild Mode design process (September 2026): a four-question brief, five externally seeded design concepts, one chosen, and two rounds with a screenshot-only design critic. Details of that process live in the MTM design-modes module, not in this repo.
 
-### Prerequisites
+## How the recommendation is written
 
-- Node.js 16+
-- npm or yarn
+1. The completed assessment is posted to a Netlify function (`netlify/functions/analyze.ts`), which asks Claude (Haiku 4.5) to write the three-road analysis under evidence rules: no invented percentages, budgets as planning bands, specific inaction risks, frameworks by their current names.
+2. If the advisor cannot be reached, a template engine (`src/utils/enhancedAnalysisGenerator.ts`) writes the same structure from the answers. The page says which one you got.
+3. The PDF is generated in the browser with `@react-pdf/renderer`. Nothing is uploaded; nothing is stored.
 
-### Installation
+Evidence behind the "what standing still costs" claims and the framework table is on the method page (`/methodology`), with sources dated September 2026.
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/nonprofit-ai-trolley.git
+## Tech stack
 
-# Navigate to project directory
-cd nonprofit-ai-trolley
+- Create React App (react-scripts 5) with TypeScript
+- Tailwind CSS 3 with `@tailwindcss/forms`
+- Framer Motion for the reveal on the facing point
+- React Hook Form
+- `@react-pdf/renderer` for the board PDF
+- Netlify: static build plus one function
 
-# Install dependencies
-npm install
-
-# Start development server
-npm start
-```
-
-The application will open at `http://localhost:3000`
-
-### Building for Production
+## Running it locally
 
 ```bash
-# Create production build
-npm run build
-
-# Deploy to Netlify (if configured)
-netlify deploy --prod --dir=build
+npm ci
+BROWSER=none npm start          # http://localhost:3000
+CI=true npm run build           # production build; warnings are errors
 ```
 
-## Usage
+The AI advisor needs `ANTHROPIC_API_KEY` in the Netlify site environment. Locally, without `netlify dev`, the page falls back to the template engine and says so.
 
-1. **Start the Assessment**: Users begin with organizational context questions
-2. **Describe AI Initiative**: Specify the type and goals of the AI implementation
-3. **Rate Concerns**: Evaluate concerns on a 1-5 scale
-4. **Provide Context**: Share current capacity and stakeholder readiness
-5. **Review & Generate**: Explore the trolley animation and generate a PDF report
-
-## Report Structure
-
-The generated PDF includes:
-- Executive summary with organizational context
-- Detailed analysis of all three paths
-- Risk mitigation strategies
-- Implementation recommendations
-- Next steps and discussion questions
-- Additional resources
-
-## Development
-
-### Project Structure
+## Project structure
 
 ```
 src/
   components/
-    QuestionFlow/     # Multi-step form components
-    TrolleyAnimation/ # Interactive decision visualization
-    ProgressBar.tsx   # Progress indicator
+    AssessmentFlow.tsx        Nameplate, track strip, section routing, carbon strip
+    WelcomeSection.tsx        Hero, evidence, briefing film, what you leave with
+    SectionStrip.tsx          The five track sections
+    LampScale.tsx             1 to 5 lamp rating row
+    CarbonStrip.tsx           Answers carried at the foot; top concerns for the diagram
+    ComparisonView.tsx        Three roads side by side, as a ledger
+    MethodologyPage.tsx       Method, evidence, frameworks and law, sources
+    QuestionFlow/             Sections 1 to 4 and the analysis (EnhancedReviewStep)
+    TrolleyAnimation/         The facing-point diagram (TrolleyScene)
   utils/
-    analysisGenerator.ts  # Logic for generating recommendations
-    pdfGenerator.ts      # PDF report creation
-  types/              # TypeScript type definitions
+    enhancedAnalysisGenerator.ts   Template engine (fallback)
+    recommendationTemplates.ts     Concern-specific plan items
+    roadNames.ts                   One name per road, everywhere
+    pdfReport.tsx                  The board PDF
+netlify/functions/analyze.ts       The AI advisor
 ```
 
-### Key Components
+## Licence and attribution
 
-- **StepOne-StepFour**: Question flow components
-- **ReviewStep**: Final review with trolley animation
-- **TrolleyScene**: Interactive SVG animation
-- **ProgressBar**: Visual progress indicator
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is proprietary and intended for educational use within nonprofit AI training programs.
-
-## Acknowledgments
-
-Built for the Human-Centered AI Course for Nonprofit Professionals
-Developed by Meet the Moment (MTM)
-
-## Support
-
-For questions or support, please contact the course instructors or open an issue in the repository.
-
----
-
-*Empowering nonprofits to make ethical AI decisions with confidence*
+Proprietary. Built by Meet the Moment for the Human-Centered AI course for nonprofit professionals and released free for public use. The briefing film is "Cat Trolley Problem" by Answer in Progress, embedded from YouTube.

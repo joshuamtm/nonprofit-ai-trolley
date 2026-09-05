@@ -1,143 +1,96 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  html { scroll-behavior: smooth; }
   body {
-    @apply bg-background text-textDark;
+    @apply bg-paper text-ink font-sans antialiased;
     margin: 0;
-    font-family: 'Source Sans 3', system-ui, -apple-system, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-size: 17px;
+    line-height: 1.55;
+  }
+  h1, h2, h3 { @apply text-ink; }
+  ::selection { background: rgba(20, 32, 43, 0.18); }
+
+  /* One visible focus style, everywhere. */
+  *:focus-visible {
+    outline: 2px solid #14202B;
+    outline-offset: 3px;
   }
 
-  h1 {
-    font-family: 'DM Serif Display', Georgia, serif;
-    @apply text-3xl text-textDark;
-    letter-spacing: -0.01em;
-  }
-
-  h2 {
-    font-family: 'DM Serif Display', Georgia, serif;
-    @apply text-2xl text-textDark;
-    letter-spacing: -0.005em;
-  }
-
-  h3 {
-    @apply text-xl font-semibold text-textDark;
-  }
-
-  /* Refined form styling */
-  select, textarea, input[type="text"], input[type="email"] {
-    @apply text-base;
-    font-family: 'Source Sans 3', system-ui, sans-serif;
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 }
 
 @layer components {
-  .btn-primary {
-    @apply px-7 py-3 bg-primary text-white rounded-xl transition-all duration-200 font-semibold text-base tracking-wide;
-    box-shadow: 0 2px 8px rgba(27, 77, 62, 0.25);
+  /* The track diagram is wider than a phone. Fade the edges so the overflow is visible
+     as overflow, not as a cropped picture. Desktop never scrolls, so no fade there. */
+  .diagram-scroll {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
   }
-  .btn-primary:hover {
-    @apply bg-primary-light;
-    box-shadow: 0 4px 16px rgba(27, 77, 62, 0.3);
-    transform: translateY(-1px);
-  }
-  .btn-primary:active {
-    @apply bg-primary-dark;
-    transform: translateY(0);
-  }
-
-  .btn-secondary {
-    @apply px-7 py-3 bg-secondary text-white rounded-xl transition-all duration-200 font-semibold text-base;
-    box-shadow: 0 2px 8px rgba(196, 87, 42, 0.2);
-  }
-  .btn-secondary:hover {
-    box-shadow: 0 4px 16px rgba(196, 87, 42, 0.3);
-    transform: translateY(-1px);
+  @media (max-width: 639px) {
+    .diagram-scroll {
+      -webkit-mask-image: linear-gradient(to right, transparent 0, #000 22px, #000 calc(100% - 6px), transparent 100%);
+      mask-image: linear-gradient(to right, transparent 0, #000 22px, #000 calc(100% - 6px), transparent 100%);
+    }
   }
 
+  /* Rubrics: condensed caps on a hairline, the way a panel labels a section. */
+  .rubric {
+    @apply font-display font-semibold text-rubric uppercase text-ink-soft;
+  }
+  .rule-top { @apply border-t-2 border-ink; }
+  .rule-bottom { @apply border-b-2 border-ink; }
+  .hairline { @apply border-t border-rule; }
+
+  /* The one button style: a flat panel button. */
+  .btn-panel {
+    @apply inline-flex items-center justify-center gap-2 bg-ink text-paper font-display font-semibold uppercase tracking-[0.08em] text-[15px] px-5 py-3 whitespace-nowrap;
+    @apply hover:bg-signal transition-colors;
+    @apply disabled:bg-rule disabled:cursor-not-allowed;
+  }
   .btn-outline {
-    @apply px-7 py-3 border-2 border-primary text-primary rounded-xl transition-all duration-200 font-semibold text-base;
+    @apply inline-flex items-center justify-center gap-2 border-2 border-ink text-ink font-display font-semibold uppercase tracking-[0.08em] text-[14px] px-4 py-2.5 bg-transparent whitespace-nowrap;
+    @apply hover:bg-ink hover:text-paper transition-colors;
   }
-  .btn-outline:hover {
-    @apply bg-primary text-white;
-    transform: translateY(-1px);
-  }
+  /* Legacy class names kept so untouched call sites still render in-system. */
+  .btn-primary { @apply btn-panel; }
+  .btn-secondary { @apply btn-panel; }
 
-  .card {
-    @apply bg-surface rounded-2xl p-8 border border-rail-light;
-    box-shadow: 0 1px 3px rgba(28, 25, 23, 0.04), 0 4px 12px rgba(28, 25, 23, 0.03);
-  }
-
+  /* Fields: ruled lines on the paper, not boxes. */
   .input-field {
-    @apply w-full px-4 py-3 bg-surface-warm border border-rail-light rounded-xl text-textDark transition-all duration-200;
+    @apply w-full bg-paper-light border border-rule px-3 py-2.5 text-ink font-sans text-[16px];
+    @apply focus:border-ink focus:ring-0;
+    border-radius: 0;
   }
-  .input-field:focus {
-    @apply outline-none border-primary ring-2 ring-primary/20;
+  select.input-field { @apply pr-9; }
+  textarea.input-field { @apply leading-relaxed; }
+
+  /* A choice row: a ruled line with a square check, no card. */
+  .choice {
+    @apply flex items-start gap-3 py-2.5 border-b border-rule cursor-pointer;
   }
-
-  .progress-step {
-    @apply w-full h-1.5 bg-rail-light rounded-full overflow-hidden;
+  .choice input[type="checkbox"], .choice input[type="radio"] {
+    @apply mt-1 h-4 w-4 border-2 border-ink text-ink bg-paper-light focus:ring-0 focus:ring-offset-0;
+    @apply checked:bg-ink checked:border-ink hover:checked:bg-ink focus:checked:bg-ink;
+    border-radius: 0;
   }
+  .choice input[type="radio"] { border-radius: 0; }
 
-  .progress-fill {
-    @apply h-full bg-primary transition-all duration-500 ease-out rounded-full;
-  }
-}
+  /* The card class is retired: sections sit directly on the paper between rules. */
+  .card { @apply rule-top pt-5 mt-8; }
 
-/* Railway track pattern for decorative backgrounds */
-.track-pattern {
-  background-image:
-    repeating-linear-gradient(
-      90deg,
-      transparent,
-      transparent 28px,
-      rgba(168, 162, 158, 0.15) 28px,
-      rgba(168, 162, 158, 0.15) 30px
-    );
-}
+  .ledger { @apply w-full text-[15px]; }
+  .ledger th { @apply rubric text-left font-semibold pb-2 border-b-2 border-ink; }
+  .ledger td { @apply py-2.5 align-top border-b border-rule; }
+  .ledger tr:last-child td { @apply border-b-0; }
+  .num { @apply font-mono text-right tabular-nums whitespace-nowrap; }
 
-/* Subtle grain texture overlay */
-.grain-overlay::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.015;
-  pointer-events: none;
-  z-index: 9999;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(168, 162, 158, 0.4);
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 162, 158, 0.6);
-}
-
-/* Focus visible for accessibility */
-*:focus-visible {
-  outline: 2px solid #1B4D3E;
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* Rating scale selected state refinement */
-input[type="radio"]:checked + div {
-  font-weight: 600;
+  .prose-panel p { @apply mb-3; }
 }
