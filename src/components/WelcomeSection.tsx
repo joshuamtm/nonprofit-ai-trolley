@@ -24,7 +24,7 @@ const WelcomeSection: React.FC<WelcomeSectionProps> = ({ onGetStarted }) => {
           <button type="button" onClick={onGetStarted} className="btn-panel px-7 py-3.5 text-[16px]">
             Begin, section 1
           </button>
-          <span className="font-mono text-[12.5px] text-ink-soft">No sign-up · your answers stay in your browser · free</span>
+          <span className="font-mono text-[12.5px] text-ink-soft">Built by Meet the Moment for nonprofit teams. No sign-up, your answers stay in your browser, free.</span>
         </div>
       </section>
 

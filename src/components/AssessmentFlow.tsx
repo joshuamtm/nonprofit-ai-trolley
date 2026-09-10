@@ -116,7 +116,7 @@ const AssessmentFlow: React.FC = () => {
       <footer className="max-w-panel mx-auto w-full px-4 py-8">
         <div className="hairline pt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-[13px] text-ink-soft">
           <p>A free tool from <a href="https://mtm.now" target="_blank" rel="noopener noreferrer" className="underline decoration-1 underline-offset-4 text-ink hover:text-signal">Meet the Moment</a>, technology advisory for nonprofits.</p>
-          <p className="font-mono text-[12px]">No sign-up · your answers stay in your browser · free</p>
+          <p className="font-mono text-[12px]">Built by Meet the Moment for nonprofit teams. No sign-up, your answers stay in your browser, free.</p>
         </div>
       </footer>
     </div>
